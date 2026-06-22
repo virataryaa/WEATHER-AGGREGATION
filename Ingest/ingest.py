@@ -18,8 +18,11 @@ DB_FILE   = os.path.join(BASE, "Database", "weather_mg.parquet")
 MAPS_DIR  = os.path.join(BASE, "Database", "maps")
 os.makedirs(MAPS_DIR, exist_ok=True)
 
-# Minas Gerais bounding box
+# Minas Gerais bounding box (for statistics)
 MG = {"lat_min": -22.9, "lat_max": -14.2, "lon_min": -51.0, "lon_max": -39.8}
+
+# Full Brazil bounding box (for map)
+BRAZIL = {"lat_min": -33.8, "lat_max": 5.3, "lon_min": -73.9, "lon_max": -34.8}
 
 ZONE_LABELS = {
     "Sul de Minas":       {"lat": (-22.5, -20.5), "lon": (-47.5, -44.5)},
@@ -58,6 +61,12 @@ def clip_mg(da):
         longitude=slice(MG["lon_min"], MG["lon_max"]),
     )
 
+def clip_brazil(da):
+    return da.sel(
+        latitude=slice(BRAZIL["lat_max"], BRAZIL["lat_min"]),
+        longitude=slice(BRAZIL["lon_min"], BRAZIL["lon_max"]),
+    )
+
 
 def load_field(shortname, step_range):
     ds = xr.open_dataset(
@@ -86,8 +95,8 @@ def make_map(tp_mg, msl_mg, run_date):
     fig = plt.figure(figsize=(10, 8), facecolor="#ffffff")
     ax = plt.axes(projection=ccrs.PlateCarree(), facecolor="#dce9f5")
 
-    ax.set_extent([MG["lon_min"] - 0.5, MG["lon_max"] + 0.5,
-                   MG["lat_min"] - 0.5, MG["lat_max"] + 0.5],
+    ax.set_extent([BRAZIL["lon_min"], BRAZIL["lon_max"],
+                   BRAZIL["lat_min"], BRAZIL["lat_max"]],
                   crs=ccrs.PlateCarree())
 
     # land base — no OCEAN/LAND features (causes artifacts), just plain bg + borders
@@ -191,8 +200,10 @@ def main():
     tp_delta = (tp_24 - tp_12) * 1000
     msl_hpa  = msl_24 / 100
 
-    tp_mg  = clip_mg(tp_delta)
-    msl_mg = clip_mg(msl_hpa)
+    tp_mg     = clip_mg(tp_delta)
+    msl_mg    = clip_mg(msl_hpa)
+    tp_brazil = clip_brazil(tp_delta)
+    msl_brazil= clip_brazil(msl_hpa)
 
     precip_mean = float(tp_mg.mean().values)
     mslp_mean   = float(msl_mg.mean().values)
@@ -203,7 +214,7 @@ def main():
     for z, v in zone_stats.items():
         print(f"  {z:<22}: {v:.2f} mm")
 
-    make_map(tp_mg, msl_mg, run_date)
+    make_map(tp_brazil, msl_brazil, run_date)
     update_database(run_date, precip_mean, mslp_mean, zone_stats)
 
     # cleanup grib
