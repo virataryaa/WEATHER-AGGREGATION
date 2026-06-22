@@ -99,7 +99,7 @@ if today is not None:
 
 st.markdown(f"""
 <div class="map-card">
-    <div class="card-header">Minas Gerais — Arabica</div>
+    <div class="card-header">Brazil — Coffee Growing Regions</div>
 """, unsafe_allow_html=True)
 
 if map_path:

@@ -25,10 +25,15 @@ MG = {"lat_min": -22.9, "lat_max": -14.2, "lon_min": -51.0, "lon_max": -39.8}
 BRAZIL = {"lat_min": -33.8, "lat_max": 5.3, "lon_min": -73.9, "lon_max": -34.8}
 
 ZONE_LABELS = {
-    "Sul de Minas":       {"lat": (-22.5, -20.5), "lon": (-47.5, -44.5)},
-    "Cerrado Mineiro":    {"lat": (-19.5, -17.0), "lon": (-48.5, -45.5)},
-    "Chapada de Minas":   {"lat": (-17.5, -15.5), "lon": (-42.5, -40.5)},
-    "Matas de Minas":     {"lat": (-21.0, -18.5), "lon": (-43.5, -41.0)},
+    "Sul de Minas":           {"lat": (-22.5, -20.5), "lon": (-47.5, -44.5)},
+    "Cerrado Mineiro":        {"lat": (-19.5, -17.0), "lon": (-48.5, -45.5)},
+    "Chapada de Minas":       {"lat": (-17.5, -15.5), "lon": (-42.5, -40.5)},
+    "Matas de Minas":         {"lat": (-21.0, -18.5), "lon": (-43.5, -41.0)},
+    "Bahia":                  {"lat": (-14.5, -12.0), "lon": (-42.0, -39.5)},
+    "Espirito Santo":         {"lat": (-20.5, -18.5), "lon": (-41.5, -40.0)},
+    "Sao Paulo":              {"lat": (-23.5, -21.5), "lon": (-49.5, -47.0)},
+    "Parana":                 {"lat": (-24.5, -23.0), "lon": (-52.0, -50.0)},
+    "Rondonia (Robusta)":     {"lat": (-12.5, -10.5), "lon": (-64.5, -62.0)},
 }
 
 
@@ -145,7 +150,7 @@ def make_map(tp_mg, msl_mg, run_date):
     gl.xlabel_style = {"color": "#718096", "fontsize": 7}
     gl.ylabel_style = {"color": "#718096", "fontsize": 7}
 
-    fig.text(0.5, 0.97, "Minas Gerais — Precipitation & MSLP",
+    fig.text(0.5, 0.97, "Brazil — Coffee Growing Regions",
              ha="center", color="#1a202c", fontsize=13, fontweight="bold")
     fig.text(0.5, 0.93, f"ECMWF Forecast  |  Valid: {run_date}  |  12-24h Accumulation",
              ha="center", color="#718096", fontsize=8)
