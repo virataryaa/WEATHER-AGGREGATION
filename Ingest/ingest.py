@@ -109,7 +109,7 @@ def compute_mg_stats(tp_mg, msl_mg, tmin_mg, tmax_mg):
 
 def make_map(da_sa, msl_sa, param, run_date):
     cfg = MAP_CONFIGS[param]
-    fig = plt.figure(figsize=(7, 8), facecolor="#ffffff")
+    fig = plt.figure(figsize=(5, 6), facecolor="#ffffff")
     ax  = plt.axes(projection=ccrs.PlateCarree(), facecolor="#ccdff0")
 
     ax.set_extent([SA["lon_min"], SA["lon_max"], SA["lat_min"], SA["lat_max"]],
@@ -164,7 +164,7 @@ def make_map(da_sa, msl_sa, param, run_date):
              ha="center", color="#a0aec0", fontsize=6.5)
 
     out_path = os.path.join(MAPS_DIR, f"{run_date}_{param}.png")
-    plt.savefig(out_path, dpi=130, bbox_inches="tight", facecolor="#ffffff")
+    plt.savefig(out_path, dpi=100, bbox_inches="tight", facecolor="#ffffff")
     plt.close()
     print(f"[{datetime.now():%H:%M:%S}] Map saved -> {out_path}")
     return out_path

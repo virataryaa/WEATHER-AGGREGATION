@@ -41,11 +41,13 @@ run_date = latest_date()
 param_label = st.radio("", list(PARAMS.keys()), horizontal=True, label_visibility="collapsed")
 param_key   = PARAMS[param_label]
 
-if run_date:
-    map_path = os.path.join(MAPS_DIR, f"{run_date}_{param_key}.png")
-    if os.path.exists(map_path):
-        st.image(map_path, use_container_width=True)
+col, _ = st.columns([1, 1])
+with col:
+    if run_date:
+        map_path = os.path.join(MAPS_DIR, f"{run_date}_{param_key}.png")
+        if os.path.exists(map_path):
+            st.image(map_path, use_container_width=True)
+        else:
+            st.caption(f"No {param_label} map for {run_date}.")
     else:
-        st.caption(f"No {param_label} map for {run_date}.")
-else:
-    st.caption("No maps yet — run Ingest/ingest.py.")
+        st.caption("No maps yet — run Ingest/ingest.py.")
