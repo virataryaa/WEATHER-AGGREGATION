@@ -83,63 +83,68 @@ def compute_zone_stats(da_mm):
 
 
 def make_map(tp_mg, msl_mg, run_date):
-    fig = plt.figure(figsize=(10, 8), facecolor="#0d1117")
-    ax = plt.axes(projection=ccrs.PlateCarree(), facecolor="#0d1117")
+    fig = plt.figure(figsize=(10, 8), facecolor="#ffffff")
+    ax = plt.axes(projection=ccrs.PlateCarree(), facecolor="#dce9f5")
 
-    ax.set_extent([MG["lon_min"] - 1, MG["lon_max"] + 1,
-                   MG["lat_min"] - 1, MG["lat_max"] + 1],
+    ax.set_extent([MG["lon_min"] - 0.5, MG["lon_max"] + 0.5,
+                   MG["lat_min"] - 0.5, MG["lat_max"] + 0.5],
                   crs=ccrs.PlateCarree())
 
-    ax.add_feature(cfeature.OCEAN.with_scale("50m"), facecolor="#1a2332")
-    ax.add_feature(cfeature.LAND.with_scale("50m"),  facecolor="#1c2333")
-    ax.add_feature(cfeature.STATES.with_scale("50m"), edgecolor="#4a5568", linewidth=0.8)
-    ax.add_feature(cfeature.BORDERS.with_scale("50m"), edgecolor="#718096", linewidth=1.0)
-    ax.add_feature(cfeature.COASTLINE.with_scale("50m"), edgecolor="#718096", linewidth=1.0)
+    # land base — no OCEAN/LAND features (causes artifacts), just plain bg + borders
+    ax.add_feature(cfeature.LAND.with_scale("10m"), facecolor="#f0ece4", zorder=0)
+    ax.add_feature(cfeature.STATES.with_scale("10m"), edgecolor="#aab0b8", linewidth=0.8, zorder=1)
+    ax.add_feature(cfeature.BORDERS.with_scale("10m"), edgecolor="#7a8490", linewidth=1.2, zorder=1)
+    ax.add_feature(cfeature.COASTLINE.with_scale("10m"), edgecolor="#7a8490", linewidth=1.0, zorder=1)
 
     # precipitation fill
     levels_tp = [0.5, 1, 2, 5, 10, 15, 20, 30, 50, 75, 100]
-    cmap_tp = plt.get_cmap("Blues")
+    cmap_tp = plt.get_cmap("YlGnBu")
     cf = ax.contourf(
         tp_mg.longitude.values, tp_mg.latitude.values, tp_mg.values,
-        levels=levels_tp, cmap=cmap_tp, alpha=0.85,
-        transform=ccrs.PlateCarree(), extend="max",
+        levels=levels_tp, cmap=cmap_tp, alpha=0.80,
+        transform=ccrs.PlateCarree(), extend="max", zorder=2,
     )
 
     # MSLP contours
+    msl_levels = np.arange(
+        int(msl_mg.values.min()) - (int(msl_mg.values.min()) % 2),
+        int(msl_mg.values.max()) + 4, 2
+    )
     cs = ax.contour(
         msl_mg.longitude.values, msl_mg.latitude.values, msl_mg.values,
-        levels=np.arange(int(msl_mg.values.min()) - 2, int(msl_mg.values.max()) + 2, 2),
-        colors="white", linewidths=0.6, alpha=0.5,
-        transform=ccrs.PlateCarree(),
+        levels=msl_levels, colors="#2d3748", linewidths=0.8, alpha=0.6,
+        transform=ccrs.PlateCarree(), zorder=3,
     )
-    ax.clabel(cs, fmt="%d", fontsize=6, colors="white")
+    ax.clabel(cs, fmt="%d", fontsize=7, colors="#2d3748", inline=True)
 
     # zone labels
     for zone, bounds in ZONE_LABELS.items():
         clat = (bounds["lat"][0] + bounds["lat"][1]) / 2
         clon = (bounds["lon"][0] + bounds["lon"][1]) / 2
-        ax.text(clon, clat, zone, fontsize=6.5, color="#e2e8f0",
-                ha="center", va="center", transform=ccrs.PlateCarree(),
-                bbox=dict(boxstyle="round,pad=0.2", facecolor="#0d1117", alpha=0.6, edgecolor="none"))
+        ax.text(clon, clat, zone, fontsize=7.5, color="#1a202c",
+                ha="center", va="center", transform=ccrs.PlateCarree(), zorder=4,
+                bbox=dict(boxstyle="round,pad=0.25", facecolor="white", alpha=0.75, edgecolor="#cbd5e0", linewidth=0.5))
 
-    cbar = plt.colorbar(cf, ax=ax, orientation="vertical", pad=0.02, shrink=0.75)
-    cbar.set_label("Precipitation (mm)", color="#a0aec0", fontsize=9)
-    cbar.ax.yaxis.set_tick_params(color="#a0aec0")
-    plt.setp(cbar.ax.yaxis.get_ticklabels(), color="#a0aec0", fontsize=8)
+    cbar = plt.colorbar(cf, ax=ax, orientation="vertical", pad=0.02, shrink=0.80, aspect=25)
+    cbar.set_label("Precipitation (mm)", color="#4a5568", fontsize=9)
+    cbar.ax.yaxis.set_tick_params(color="#4a5568")
+    plt.setp(cbar.ax.yaxis.get_ticklabels(), color="#4a5568", fontsize=8)
 
-    ax.gridlines(draw_labels=True, linewidth=0.3, color="#2d3748", alpha=0.7,
-                 xlabel_style={"color": "#a0aec0", "fontsize": 7},
-                 ylabel_style={"color": "#a0aec0", "fontsize": 7})
+    gl = ax.gridlines(draw_labels=True, linewidth=0.3, color="#c0c8d0", alpha=0.8, linestyle="--")
+    gl.top_labels = False
+    gl.right_labels = False
+    gl.xlabel_style = {"color": "#718096", "fontsize": 7}
+    gl.ylabel_style = {"color": "#718096", "fontsize": 7}
 
-    fig.text(0.5, 0.96, "Minas Gerais — Precipitation & MSLP",
-             ha="center", color="#e2e8f0", fontsize=13, fontweight="bold")
-    fig.text(0.5, 0.92, f"ECMWF Forecast  |  Valid: {run_date}  |  12–24h Accumulation",
+    fig.text(0.5, 0.97, "Minas Gerais — Precipitation & MSLP",
+             ha="center", color="#1a202c", fontsize=13, fontweight="bold")
+    fig.text(0.5, 0.93, f"ECMWF Forecast  |  Valid: {run_date}  |  12-24h Accumulation",
              ha="center", color="#718096", fontsize=8)
     fig.text(0.5, 0.01, "Source: ECMWF Open Data  |  CC-BY-4.0",
-             ha="center", color="#4a5568", fontsize=7)
+             ha="center", color="#a0aec0", fontsize=7)
 
     out_path = os.path.join(MAPS_DIR, f"{run_date}.png")
-    plt.savefig(out_path, dpi=150, bbox_inches="tight", facecolor="#0d1117")
+    plt.savefig(out_path, dpi=150, bbox_inches="tight", facecolor="#ffffff")
     plt.close()
     print(f"[{datetime.now():%H:%M:%S}] Map saved -> {out_path}")
     return out_path
