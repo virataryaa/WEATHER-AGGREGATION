@@ -1,0 +1,5 @@
+Ingest/today.grib
+Ingest/*.idx
+__pycache__/
+*.pyc
+.DS_Store
