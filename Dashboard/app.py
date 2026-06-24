@@ -62,22 +62,38 @@ def show_map(path):
 ecmwf_date = latest_date(prefix="", suffix="_precip.png")
 maxar_date = latest_date(prefix="maxar_precip_7d_", suffix=".png")
 
-left, right = st.columns(2, gap="large")
+tab1, tab2 = st.tabs(["Forecast", "ERA5 Reanalysis"])
 
-# ── ECMWF card ───────────────────────────────────────────────────────────────
-with left:
-    st.markdown('<div class="card-label">ECMWF Open Data — South America</div>', unsafe_allow_html=True)
-    e_param = st.radio("e", list(ECMWF_PARAMS.keys()), horizontal=True, label_visibility="collapsed", key="ecmwf")
-    if ecmwf_date:
-        show_map(os.path.join(MAPS_DIR, f"{ecmwf_date}_{ECMWF_PARAMS[e_param]}.png"))
-    else:
-        st.caption("Run Ingest/ingest.py to generate maps.")
+# ── Tab 1: Forecast ──────────────────────────────────────────────────────────
+with tab1:
+    left, right = st.columns(2, gap="large")
 
-# ── Maxar card ───────────────────────────────────────────────────────────────
-with right:
-    st.markdown('<div class="card-label">Maxar WeatherDesk — Brazil (ECMWF Op)</div>', unsafe_allow_html=True)
-    m_param = st.radio("m", list(MAXAR_PARAMS.keys()), horizontal=True, label_visibility="collapsed", key="maxar")
-    if maxar_date:
-        show_map(os.path.join(MAPS_DIR, f"maxar_{MAXAR_PARAMS[m_param]}_{maxar_date}.png"))
-    else:
-        st.caption("Run Ingest/ingest_maxar.py to generate maps.")
+    with left:
+        st.markdown('<div class="card-label">ECMWF Open Data — South America</div>', unsafe_allow_html=True)
+        e_param = st.radio("e", list(ECMWF_PARAMS.keys()), horizontal=True, label_visibility="collapsed", key="ecmwf")
+        if ecmwf_date:
+            show_map(os.path.join(MAPS_DIR, f"{ecmwf_date}_{ECMWF_PARAMS[e_param]}.png"))
+        else:
+            st.caption("Run Ingest/ingest.py to generate maps.")
+
+    with right:
+        st.markdown('<div class="card-label">Maxar WeatherDesk — Brazil (ECMWF Op)</div>', unsafe_allow_html=True)
+        m_param = st.radio("m", list(MAXAR_PARAMS.keys()), horizontal=True, label_visibility="collapsed", key="maxar")
+        if maxar_date:
+            show_map(os.path.join(MAPS_DIR, f"maxar_{MAXAR_PARAMS[m_param]}_{maxar_date}.png"))
+        else:
+            st.caption("Run Ingest/ingest_maxar.py to generate maps.")
+
+# ── Tab 2: ERA5 ──────────────────────────────────────────────────────────────
+with tab2:
+    left2, _ = st.columns([1, 1])
+    with left2:
+        st.markdown('<div class="card-label">ERA5 Reanalysis — 30-Day Cumulative Precip</div>', unsafe_allow_html=True)
+        era5_maps = sorted(glob.glob(os.path.join(MAPS_DIR, "era5_precip30d_*.png")))
+        if era5_maps:
+            show_map(era5_maps[-1])
+            fname = os.path.basename(era5_maps[-1])
+            run_d = fname.replace("era5_precip30d_", "").replace(".png", "")
+            st.caption(f"Generated: {run_d}")
+        else:
+            st.caption("Run Ingest/ingest_era5.py to generate.")

@@ -14,10 +14,16 @@ if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] ECMWF ingest failed.
 )
 
-echo [2/2] Maxar WeatherDesk...
+echo [2/3] Maxar WeatherDesk...
 python "%BASE%\Ingest\ingest_maxar.py"
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Maxar ingest failed.
+)
+
+echo [3/3] ERA5 Reanalysis...
+python "%BASE%\Ingest\ingest_era5.py"
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] ERA5 ingest failed.
 )
 
 cd /d "%BASE%"
