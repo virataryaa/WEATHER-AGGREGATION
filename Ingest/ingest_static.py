@@ -122,6 +122,8 @@ def main():
         except Exception as e:
             print(f"skipped ({e})")
 
+    from run_stamp import stamp
+    stamp("static")
     print(f"\n{'='*55}")
     print(f"  Done.\n")
 

@@ -398,6 +398,8 @@ def main():
     if os.path.exists(GRIB_FILE):
         os.remove(GRIB_FILE)
 
+    from run_stamp import stamp
+    stamp("ecmwf")
     print(f"[{datetime.now():%H:%M:%S}] Done.\n")
 
 

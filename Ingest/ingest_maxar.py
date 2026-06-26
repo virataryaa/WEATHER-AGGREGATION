@@ -229,6 +229,8 @@ def main():
         print(f"\n  [{display_name} — Ensemble]")
         fetch_en_region(region_key, maxar_region, run_date)
 
+    from run_stamp import stamp
+    stamp("maxar")
     print(f"\n[{datetime.now():%H:%M:%S}] Done.\n")
 
 

@@ -191,6 +191,8 @@ def main():
         fetch_weekly_anomaly_region("extended-anomaly-tp", "tp", region_key, projection, run_date)
         fetch_weekly_anomaly_region("extended-anomaly-2t", "2t", region_key, projection, run_date)
 
+    from run_stamp import stamp
+    stamp("opencharts")
     print(f"\n{'='*55}")
     print(f"  Done.\n")
 

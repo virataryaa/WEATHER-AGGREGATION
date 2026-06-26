@@ -132,6 +132,8 @@ def main():
     print(f"{'='*50}")
     start, end = download(days=30)
     make_map(start, end)
+    from run_stamp import stamp
+    stamp("era5")
     print(f"[{datetime.now():%H:%M:%S}] Done.\n")
 
 
