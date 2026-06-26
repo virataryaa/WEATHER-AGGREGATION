@@ -97,7 +97,7 @@ def fetch_weekly_anomaly(product, key, run_date):
             saved += 1
         except Exception as e:
             print(f"skipped ({e})")
-        time.sleep(3)
+        time.sleep(1)
     print(f"    Saved {saved}/4")
 
 
@@ -118,7 +118,7 @@ def fetch_seasonal_rain(run_date):
             saved += 1
         except Exception as e:
             print(f"skipped ({e})")
-        time.sleep(3)
+        time.sleep(1)
     print(f"    Saved {saved}/4")
 
 
@@ -169,7 +169,7 @@ def fetch_weekly_anomaly_region(product, key, region_key, projection, run_date):
             saved += 1
         except Exception as e:
             print(f"skipped ({e})")
-        time.sleep(3)
+        time.sleep(1)
     print(f"    Saved {saved}/4")
 
 
