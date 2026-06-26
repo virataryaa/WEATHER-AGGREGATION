@@ -1,10 +1,15 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 
 set BASE=C:\Users\virat.arya\ETG\SoftsDatabase - Documents\Database\Hardmine\Non Fundamental\Weather\AGGREGATION OF WEATHER
 set MAPS=%BASE%\Database\maps
 set LOG=%BASE%\Automator\run_morning.log
 set PYTHON=python
+set INGEST_STATUS=ok
+set GIT_STATUS=skipped
+
+set GCM_INTERACTIVE=never
+set GIT_TERMINAL_PROMPT=0
 
 echo. >> "%LOG%"
 echo ======================================== >> "%LOG%"
@@ -14,7 +19,11 @@ echo ======================================== >> "%LOG%"
 echo [1/5] ECMWF Open Data...
 echo [1/5] ECMWF Open Data... >> "%LOG%"
 %PYTHON% "%BASE%\Ingest\ingest.py" >> "%LOG%" 2>&1
-if %ERRORLEVEL% NEQ 0 echo [ERROR] ECMWF failed >> "%LOG%"
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] ECMWF failed >> "%LOG%"
+    set INGEST_STATUS=error
+    goto notify
+)
 
 echo [2/5] ECMWF OpenCharts...
 echo [2/5] ECMWF OpenCharts... >> "%LOG%"
@@ -40,13 +49,32 @@ echo [Purge] Removing maps older than 2 days...
 echo [Purge] Removing maps older than 2 days... >> "%LOG%"
 forfiles /P "%MAPS%" /M *.png /D -2 /C "cmd /c del @path" 2>nul
 
+echo [Git] Committing and pushing...
+echo [Git] Committing and pushing... >> "%LOG%"
 cd /d "%BASE%"
 git add Database\weather_mg.parquet
 git add "Database\maps\"
-git commit -m "Morning run %DATE% %TIME%" >> "%LOG%" 2>&1
-git push >> "%LOG%" 2>&1
+git diff --cached --quiet
+if %ERRORLEVEL% NEQ 0 (
+    git commit -m "Morning run %DATE% %TIME%" >> "%LOG%" 2>&1
+    git push >> "%LOG%" 2>&1
+    if !ERRORLEVEL! EQU 0 (
+        set GIT_STATUS=pushed
+        echo Git push done. >> "%LOG%"
+    ) else (
+        set GIT_STATUS=failed
+        echo ERROR: git push failed >> "%LOG%"
+    )
+) else (
+    echo No changes to commit. >> "%LOG%"
+    set GIT_STATUS=skipped
+)
 
-echo [Done] %DATE% %TIME% >> "%LOG%"
+:notify
+echo [Notify] Sending email... >> "%LOG%"
+%PYTHON% "%BASE%\Automator\notify.py" %INGEST_STATUS% %GIT_STATUS% >> "%LOG%" 2>&1
+
+echo Run finished: %DATE% %TIME% >> "%LOG%"
 echo.
-echo Done. See log: %LOG%
+echo Done. Log: %LOG%
 endlocal
