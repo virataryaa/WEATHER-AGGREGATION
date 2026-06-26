@@ -1,5 +1,6 @@
 import os
 import glob
+from datetime import datetime
 import streamlit as st
 
 BASE     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,6 +33,33 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("Weather Aggregation")
+
+
+def mtime(pattern):
+    f = latest(pattern)
+    if not f:
+        return "—"
+    return datetime.fromtimestamp(os.path.getmtime(f)).strftime("%d %b  %H:%M")
+
+
+SOURCES = [
+    ("ECMWF",       "20??-??-??_precip.png"),
+    ("OpenCharts",  "opencharts_anom_tp_w1_*.png"),
+    ("Maxar",       "maxar_precip_7d_*.png"),
+    ("CPC / CPTEC", "static_cpc_7d_obs_*.png"),
+    ("ERA5",        "era5_precip30d_*.png"),
+]
+
+parts = "  &nbsp;|&nbsp;  ".join(
+    f'<span style="color:#a0aec0;font-size:10px;font-weight:600;letter-spacing:.1em">{lbl}</span>'
+    f'<span style="color:#4a5568;font-size:10px;margin-left:5px">{mtime(pat)}</span>'
+    for lbl, pat in SOURCES
+)
+st.markdown(
+    f'<div style="margin:-6px 0 14px 0;padding:6px 10px;background:#f0f2f5;border-radius:6px;'
+    f'white-space:nowrap;overflow:auto">{parts}</div>',
+    unsafe_allow_html=True,
+)
 
 
 def latest(pattern):
