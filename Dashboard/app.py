@@ -5,7 +5,7 @@ import streamlit as st
 BASE     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAPS_DIR = os.path.join(BASE, "Database", "maps")
 
-st.set_page_config(page_title="Weather", layout="wide")
+st.set_page_config(page_title="Weather Aggregation", layout="wide")
 
 st.markdown("""
 <style>
@@ -17,19 +17,21 @@ st.markdown("""
         padding-top: 0 !important;
     }
     [data-testid="block-container"] { padding: 12px 20px 0 20px !important; }
-    .section-label {
-        font-size: 9px; font-weight: 600; color: #a0aec0;
-        letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px;
+    .sec-label {
+        font-size: 9px; font-weight: 700; color: #a0aec0;
+        letter-spacing: 0.14em; text-transform: uppercase;
+        margin: 18px 0 6px 0;
     }
     .map-cap {
-        font-size: 10px; color: #718096; text-align: center;
-        margin-bottom: 2px; margin-top: 4px;
+        font-size: 10px; color: #718096; text-align: center; margin-bottom: 2px;
     }
     .stImage img { border-radius: 4px; }
-    details summary { font-size: 12px !important; font-weight: 600 !important; color: #2d3748 !important; }
     footer { display: none; }
+    h1 { font-size: 18px !important; margin-bottom: 4px !important; }
 </style>
 """, unsafe_allow_html=True)
+
+st.title("Weather Aggregation")
 
 
 def latest(pattern):
@@ -37,8 +39,11 @@ def latest(pattern):
     return files[-1] if files else None
 
 
+def sec(label):
+    st.markdown(f'<div class="sec-label">{label}</div>', unsafe_allow_html=True)
+
+
 def show_grid(items, n_cols):
-    """items = list of (filepath_or_None, caption_str)"""
     cols = st.columns(n_cols, gap="small")
     for i, (path, cap) in enumerate(items):
         with cols[i % n_cols]:
@@ -49,102 +54,97 @@ def show_grid(items, n_cols):
                 st.caption("—")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 tab_br, tab_vn, tab_ic = st.tabs(["Brazil (Arabica)", "Vietnam (Robusta)", "Ivory Coast (Cocoa)"])
 
 
 # ══ BRAZIL ═══════════════════════════════════════════════════════════════════
 with tab_br:
 
-    # ── Frost Alert ──────────────────────────────────────────────────────────
-    with st.expander("Frost Alert — CPTEC Geadas", expanded=False):
-        show_grid([
-            (latest("static_geada_d1_*.png"), "Day 1"),
-            (latest("static_geada_d2_*.png"), "Day 2"),
-            (latest("static_geada_d3_*.png"), "Day 3"),
-        ], n_cols=3)
+    sec("Short-term Forecast — ECMWF Open Data")
+    show_grid([
+        (latest("*_precip.png"),  "Precip"),
+        (latest("*_tmin.png"),    "Min Temp"),
+        (latest("*_tmax.png"),    "Max Temp"),
+    ], n_cols=3)
 
-    # ── Observed ─────────────────────────────────────────────────────────────
-    with st.expander("Observed — CPC / NOAA + GFS", expanded=False):
-        show_grid([
-            (latest("static_cpc_7d_obs_*.png"),    "CPC 7-Day Observed"),
-            (latest("static_cpc_7d_anom_*.png"),   "CPC 7-Day Anomaly"),
-            (latest("static_cpc_30d_pnorm_*.png"), "CPC 30-Day % Normal"),
-            (latest("static_gfs_w1_*.png"),        "GFS Week 1"),
-            (latest("static_gfs_w2_*.png"),        "GFS Week 2"),
-        ], n_cols=5)
+    sec("Ensemble Precip (mm) — Maxar ECM vs GFS")
+    show_grid([
+        (latest("maxar_en_ecm_precip_mm_day1-5_*.png"),   "ECM Day 1-5"),
+        (latest("maxar_en_ecm_precip_mm_day6-10_*.png"),  "ECM Day 6-10"),
+        (latest("maxar_en_ecm_precip_mm_day11-15_*.png"), "ECM Day 11-15"),
+        (latest("maxar_en_gfs_precip_mm_day1-5_*.png"),   "GFS Day 1-5"),
+        (latest("maxar_en_gfs_precip_mm_day6-10_*.png"),  "GFS Day 6-10"),
+        (latest("maxar_en_gfs_precip_mm_day11-15_*.png"), "GFS Day 11-15"),
+    ], n_cols=6)
 
-    # ── Short-term Forecast ──────────────────────────────────────────────────
-    with st.expander("Short-term Forecast — ECMWF + Maxar (Day 1-7)", expanded=False):
-        show_grid([
-            (latest("*_precip.png"),           "ECMWF Precip"),
-            (latest("*_tmin.png"),             "ECMWF Min Temp"),
-            (latest("*_tmax.png"),             "ECMWF Max Temp"),
-            (latest("maxar_precip_7d_*.png"),  "Maxar 7d Precip"),
-            (latest("maxar_precip_norm_*.png"),"Maxar % Normal"),
-            (latest("maxar_temp_850_*.png"),   "Maxar 850mb Temp"),
-        ], n_cols=6)
+    sec("Ensemble % of Normal — Maxar ECM vs GFS")
+    show_grid([
+        (latest("maxar_en_ecm_precip_pct_normal_day1-5_*.png"),   "ECM Day 1-5"),
+        (latest("maxar_en_ecm_precip_pct_normal_day6-10_*.png"),  "ECM Day 6-10"),
+        (latest("maxar_en_ecm_precip_pct_normal_day11-15_*.png"), "ECM Day 11-15"),
+        (latest("maxar_en_gfs_precip_pct_normal_day1-5_*.png"),   "GFS Day 1-5"),
+        (latest("maxar_en_gfs_precip_pct_normal_day6-10_*.png"),  "GFS Day 6-10"),
+        (latest("maxar_en_gfs_precip_pct_normal_day11-15_*.png"), "GFS Day 11-15"),
+    ], n_cols=6)
 
-    # ── Weekly Precip Anomaly ────────────────────────────────────────────────
-    with st.expander("Weekly Precip Anomaly — ECMWF Extended", expanded=False):
-        show_grid([
-            (latest("opencharts_anom_tp_w1_*.png"), "Week 1"),
-            (latest("opencharts_anom_tp_w2_*.png"), "Week 2"),
-            (latest("opencharts_anom_tp_w3_*.png"), "Week 3"),
-            (latest("opencharts_anom_tp_w4_*.png"), "Week 4"),
-        ], n_cols=4)
+    sec("Maxar OP — 7-Day Summary")
+    show_grid([
+        (latest("maxar_precip_7d_*.png"),  "7-Day Precip"),
+        (latest("maxar_precip_norm_*.png"),"% of Normal"),
+        (latest("maxar_temp_850_*.png"),   "850mb Temp"),
+        (latest("maxar_temp_2m_*.png"),    "2m Temp"),
+        (latest("maxar_dewpoint_*.png"),   "Dewpoint"),
+    ], n_cols=5)
 
-    # ── Weekly Temp Anomaly ──────────────────────────────────────────────────
-    with st.expander("Weekly Temp Anomaly — ECMWF Extended", expanded=False):
-        show_grid([
-            (latest("opencharts_anom_2t_w1_*.png"), "Week 1"),
-            (latest("opencharts_anom_2t_w2_*.png"), "Week 2"),
-            (latest("opencharts_anom_2t_w3_*.png"), "Week 3"),
-            (latest("opencharts_anom_2t_w4_*.png"), "Week 4"),
-        ], n_cols=4)
+    sec("Weekly Precip Anomaly — ECMWF Extended")
+    show_grid([
+        (latest("opencharts_anom_tp_w1_*.png"), "Week 1"),
+        (latest("opencharts_anom_tp_w2_*.png"), "Week 2"),
+        (latest("opencharts_anom_tp_w3_*.png"), "Week 3"),
+        (latest("opencharts_anom_tp_w4_*.png"), "Week 4"),
+    ], n_cols=4)
 
-    # ── Ensemble Precip mm ───────────────────────────────────────────────────
-    with st.expander("Ensemble Precip (mm) — ECM vs GFS", expanded=False):
-        show_grid([
-            (latest("maxar_en_ecm_precip_mm_day1-5_*.png"),   "ECM Day 1-5"),
-            (latest("maxar_en_ecm_precip_mm_day6-10_*.png"),  "ECM Day 6-10"),
-            (latest("maxar_en_ecm_precip_mm_day11-15_*.png"), "ECM Day 11-15"),
-            (latest("maxar_en_gfs_precip_mm_day1-5_*.png"),   "GFS Day 1-5"),
-            (latest("maxar_en_gfs_precip_mm_day6-10_*.png"),  "GFS Day 6-10"),
-            (latest("maxar_en_gfs_precip_mm_day11-15_*.png"), "GFS Day 11-15"),
-        ], n_cols=6)
+    sec("Weekly Temp Anomaly — ECMWF Extended")
+    show_grid([
+        (latest("opencharts_anom_2t_w1_*.png"), "Week 1"),
+        (latest("opencharts_anom_2t_w2_*.png"), "Week 2"),
+        (latest("opencharts_anom_2t_w3_*.png"), "Week 3"),
+        (latest("opencharts_anom_2t_w4_*.png"), "Week 4"),
+    ], n_cols=4)
 
-    # ── Ensemble % Normal ────────────────────────────────────────────────────
-    with st.expander("Ensemble % of Normal — ECM vs GFS", expanded=False):
-        show_grid([
-            (latest("maxar_en_ecm_precip_pct_normal_day1-5_*.png"),   "ECM Day 1-5"),
-            (latest("maxar_en_ecm_precip_pct_normal_day6-10_*.png"),  "ECM Day 6-10"),
-            (latest("maxar_en_ecm_precip_pct_normal_day11-15_*.png"), "ECM Day 11-15"),
-            (latest("maxar_en_gfs_precip_pct_normal_day1-5_*.png"),   "GFS Day 1-5"),
-            (latest("maxar_en_gfs_precip_pct_normal_day6-10_*.png"),  "GFS Day 6-10"),
-            (latest("maxar_en_gfs_precip_pct_normal_day11-15_*.png"), "GFS Day 11-15"),
-        ], n_cols=6)
+    sec("Frost Alert — CPTEC Geadas")
+    show_grid([
+        (latest("static_geada_d1_*.png"), "Day 1"),
+        (latest("static_geada_d2_*.png"), "Day 2"),
+        (latest("static_geada_d3_*.png"), "Day 3"),
+    ], n_cols=3)
 
-    # ── Seasonal / ENSO ──────────────────────────────────────────────────────
-    with st.expander("Seasonal / ENSO — ECMWF SEAS5", expanded=False):
-        show_grid([
-            (latest("opencharts_seas_m1_*.png"), "Month 1"),
-            (latest("opencharts_seas_m2_*.png"), "Month 2"),
-            (latest("opencharts_seas_m3_*.png"), "Month 3"),
-            (latest("opencharts_seas_m4_*.png"), "Month 4"),
-            (latest("opencharts_enso_*.png"),    "Nino 3.4 Plumes"),
-        ], n_cols=5)
+    sec("Observed — CPC / NOAA + GFS")
+    show_grid([
+        (latest("static_cpc_7d_obs_*.png"),    "CPC 7-Day Observed"),
+        (latest("static_cpc_7d_anom_*.png"),   "CPC 7-Day Anomaly"),
+        (latest("static_cpc_30d_pnorm_*.png"), "CPC 30-Day % Normal"),
+        (latest("static_gfs_w1_*.png"),        "GFS Week 1"),
+        (latest("static_gfs_w2_*.png"),        "GFS Week 2"),
+    ], n_cols=5)
 
-    # ── ERA5 ─────────────────────────────────────────────────────────────────
-    with st.expander("ERA5 Reanalysis — 30-Day Cumulative Precip", expanded=False):
-        left, _ = st.columns([1, 2])
-        with left:
-            f = latest("era5_precip30d_*.png")
-            if f:
-                st.image(f, use_container_width=True)
-                st.caption(os.path.basename(f).replace("era5_precip30d_", "").replace(".png", ""))
-            else:
-                st.caption("Run Ingest/ingest_era5.py")
+    sec("Seasonal / ENSO — ECMWF SEAS5")
+    show_grid([
+        (latest("opencharts_seas_m1_*.png"), "Month 1"),
+        (latest("opencharts_seas_m2_*.png"), "Month 2"),
+        (latest("opencharts_seas_m3_*.png"), "Month 3"),
+        (latest("opencharts_seas_m4_*.png"), "Month 4"),
+        (latest("opencharts_enso_*.png"),    "Nino 3.4 Plumes"),
+    ], n_cols=5)
+
+    sec("ERA5 Reanalysis — 30-Day Cumulative Precip")
+    left, _ = st.columns([1, 2])
+    with left:
+        f = latest("era5_precip30d_*.png")
+        if f:
+            st.image(f, use_container_width=True)
+        else:
+            st.caption("Run Ingest/ingest_era5.py")
 
 
 # ══ VIETNAM ══════════════════════════════════════════════════════════════════
