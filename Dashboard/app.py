@@ -57,14 +57,14 @@ def show_grid(items, n_cols):
 def region_tab(rk):
     """Render a full region tab given a region key (br / wa / vn / co)."""
 
-    # ECMWF maps — Brazil uses no prefix, others use rk_ prefix
-    ecmwf_prefix = "" if rk == "br" else f"{rk}_"
+    # ECMWF maps — Brazil files start with date (20??-??-??), others with rk_
+    ecmwf_pat = "20??-??-??_{p}.png" if rk == "br" else f"{rk}_20??-??-??_{{p}}.png"
 
     sec("Short-term Forecast — ECMWF Open Data")
     show_grid([
-        (latest(f"{ecmwf_prefix}*_precip.png"), "Precip"),
-        (latest(f"{ecmwf_prefix}*_tmin.png"),   "Min Temp"),
-        (latest(f"{ecmwf_prefix}*_tmax.png"),   "Max Temp"),
+        (latest(ecmwf_pat.format(p="precip")), "Precip"),
+        (latest(ecmwf_pat.format(p="tmin")),   "Min Temp"),
+        (latest(ecmwf_pat.format(p="tmax")),   "Max Temp"),
     ], n_cols=3)
 
     # Maxar OP — Brazil uses no prefix, others use rk_ prefix
@@ -161,7 +161,7 @@ def region_tab(rk):
 
 # ─────────────────────────────────────────────────────────────────────────────
 tab_br, tab_co, tab_vn, tab_ic = st.tabs([
-    "Brazil (Arabica)", "Colombia (Arabica)", "Vietnam (Robusta)", "Ivory Coast (Cocoa)"
+    "Brazil", "Colombia", "Vietnam", "Ivory Coast"
 ])
 
 with tab_br:
