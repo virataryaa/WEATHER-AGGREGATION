@@ -35,6 +35,11 @@ st.markdown("""
 st.title("Weather Aggregation")
 
 
+def latest(pattern):
+    files = sorted(glob.glob(os.path.join(MAPS_DIR, pattern)))
+    return files[-1] if files else None
+
+
 def mtime(pattern):
     f = latest(pattern)
     if not f:
@@ -60,11 +65,6 @@ st.markdown(
     f'white-space:nowrap;overflow:auto">{parts}</div>',
     unsafe_allow_html=True,
 )
-
-
-def latest(pattern):
-    files = sorted(glob.glob(os.path.join(MAPS_DIR, pattern)))
-    return files[-1] if files else None
 
 
 def sec(label):
