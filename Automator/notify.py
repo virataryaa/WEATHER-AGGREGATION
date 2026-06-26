@@ -110,7 +110,9 @@ def brazil_stats():
         pq = BASE / "Database" / "weather_mg.parquet"
         if not pq.exists():
             return "  weather_mg.parquet not found"
-        df = pd.read_parquet(pq).sort_index()
+        df = pd.read_parquet(pq)
+        df.index = pd.to_datetime(df.index)
+        df = df.sort_index()
         row = df.iloc[-1]
         dt  = df.index[-1]
         lines = [
