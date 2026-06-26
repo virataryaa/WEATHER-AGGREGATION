@@ -16,13 +16,17 @@ st.markdown("""
         background-color: #f8f9fa !important;
         padding-top: 0 !important;
     }
-    [data-testid="block-container"] { padding: 16px 24px 0 24px !important; }
-    .card-label {
+    [data-testid="block-container"] { padding: 12px 20px 0 20px !important; }
+    .section-label {
         font-size: 9px; font-weight: 600; color: #a0aec0;
-        letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px;
+        letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px;
     }
-    div[data-testid="stRadio"] label p { font-size: 11px !important; color: #4a5568; }
-    .stImage img { border-radius: 5px; }
+    .map-cap {
+        font-size: 10px; color: #718096; text-align: center;
+        margin-bottom: 2px; margin-top: 4px;
+    }
+    .stImage img { border-radius: 4px; }
+    details summary { font-size: 12px !important; font-weight: 600 !important; color: #2d3748 !important; }
     footer { display: none; }
 </style>
 """, unsafe_allow_html=True)
@@ -33,192 +37,121 @@ def latest(pattern):
     return files[-1] if files else None
 
 
-def latest_date_from(prefix, suffix="_precip.png"):
-    files = sorted(glob.glob(os.path.join(MAPS_DIR, f"{prefix}*{suffix}")))
-    if not files:
-        return None
-    fname = os.path.basename(files[-1])
-    return fname.replace(prefix, "").replace(suffix, "")
+def show_grid(items, n_cols):
+    """items = list of (filepath_or_None, caption_str)"""
+    cols = st.columns(n_cols, gap="small")
+    for i, (path, cap) in enumerate(items):
+        with cols[i % n_cols]:
+            st.markdown(f'<div class="map-cap">{cap}</div>', unsafe_allow_html=True)
+            if path and os.path.exists(path):
+                st.image(path, use_container_width=True)
+            else:
+                st.caption("—")
 
-
-def show(path):
-    if path and os.path.exists(path):
-        st.image(path, use_container_width=True)
-    else:
-        st.caption("Not available — run ingest.")
-
-
-# ── Dates ────────────────────────────────────────────────────────────────────
-ecmwf_date   = latest_date_from("", "_precip.png")
-maxar_date   = latest_date_from("maxar_precip_7d_", ".png")
-charts_date  = latest_date_from("opencharts_anom_tp_w1_", ".png")
-static_date  = latest_date_from("static_geada_d1_", ".png")
 
 # ─────────────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-    "Forecast", "Anomaly", "Frost Alert", "Observed", "Seasonal / ENSO", "ERA5"
-])
-
-# ── Tab 1: Forecast ──────────────────────────────────────────────────────────
-with tab1:
-    left, right = st.columns(2, gap="large")
-
-    ECMWF_PARAMS = {"Precipitation": "precip", "Min Temp": "tmin", "Max Temp": "tmax"}
-    MAXAR_OP_PARAMS = {
-        "7-Day Precip":     "precip_7d",
-        "% of Normal":      "precip_norm",
-        "2m Temperature":   "temp_2m",
-        "850mb Temp":       "temp_850",
-        "Dewpoint":         "dewpoint",
-    }
-
-    with left:
-        st.markdown('<div class="card-label">ECMWF Open Data -- South America</div>', unsafe_allow_html=True)
-        e_p = st.radio("e", list(ECMWF_PARAMS), horizontal=True, label_visibility="collapsed", key="ecmwf")
-        if ecmwf_date:
-            show(os.path.join(MAPS_DIR, f"{ecmwf_date}_{ECMWF_PARAMS[e_p]}.png"))
-        else:
-            st.caption("Run Ingest/ingest.py")
-
-    with right:
-        st.markdown('<div class="card-label">Maxar WeatherDesk -- Brazil (ECMWF Op)</div>', unsafe_allow_html=True)
-        m_p = st.radio("m", list(MAXAR_OP_PARAMS), horizontal=True, label_visibility="collapsed", key="maxar_op")
-        if maxar_date:
-            show(os.path.join(MAPS_DIR, f"maxar_{MAXAR_OP_PARAMS[m_p]}_{maxar_date}.png"))
-        else:
-            st.caption("Run Ingest/ingest_maxar.py")
+tab_br, tab_vn, tab_ic = st.tabs(["Brazil (Arabica)", "Vietnam (Robusta)", "Ivory Coast (Cocoa)"])
 
 
-# ── Tab 2: Anomaly ───────────────────────────────────────────────────────────
-with tab2:
-    left, right = st.columns(2, gap="large")
+# ══ BRAZIL ═══════════════════════════════════════════════════════════════════
+with tab_br:
 
-    WEEK_OPTS  = {"Week 1": "w1", "Week 2": "w2", "Week 3": "w3", "Week 4": "w4"}
+    # ── Frost Alert ──────────────────────────────────────────────────────────
+    with st.expander("Frost Alert — CPTEC Geadas", expanded=False):
+        show_grid([
+            (latest("static_geada_d1_*.png"), "Day 1"),
+            (latest("static_geada_d2_*.png"), "Day 2"),
+            (latest("static_geada_d3_*.png"), "Day 3"),
+        ], n_cols=3)
 
-    with left:
-        st.markdown('<div class="card-label">ECMWF Extended -- Weekly Precip Anomaly</div>', unsafe_allow_html=True)
-        wk_tp = st.radio("wtp", list(WEEK_OPTS), horizontal=True, label_visibility="collapsed", key="anom_tp")
-        d = charts_date
-        if d:
-            show(os.path.join(MAPS_DIR, f"opencharts_anom_tp_{WEEK_OPTS[wk_tp]}_{d}.png"))
-        else:
-            st.caption("Run Ingest/ingest_opencharts.py")
+    # ── Observed ─────────────────────────────────────────────────────────────
+    with st.expander("Observed — CPC / NOAA + GFS", expanded=False):
+        show_grid([
+            (latest("static_cpc_7d_obs_*.png"),    "CPC 7-Day Observed"),
+            (latest("static_cpc_7d_anom_*.png"),   "CPC 7-Day Anomaly"),
+            (latest("static_cpc_30d_pnorm_*.png"), "CPC 30-Day % Normal"),
+            (latest("static_gfs_w1_*.png"),        "GFS Week 1"),
+            (latest("static_gfs_w2_*.png"),        "GFS Week 2"),
+        ], n_cols=5)
 
-    with right:
-        st.markdown('<div class="card-label">ECMWF Extended -- Weekly Temp Anomaly</div>', unsafe_allow_html=True)
-        wk_2t = st.radio("w2t", list(WEEK_OPTS), horizontal=True, label_visibility="collapsed", key="anom_2t")
-        d2 = latest_date_from("opencharts_anom_2t_w1_", ".png")
-        if d2:
-            show(os.path.join(MAPS_DIR, f"opencharts_anom_2t_{WEEK_OPTS[wk_2t]}_{d2}.png"))
-        else:
-            st.caption("Run Ingest/ingest_opencharts.py")
+    # ── Short-term Forecast ──────────────────────────────────────────────────
+    with st.expander("Short-term Forecast — ECMWF + Maxar (Day 1-7)", expanded=False):
+        show_grid([
+            (latest("*_precip.png"),           "ECMWF Precip"),
+            (latest("*_tmin.png"),             "ECMWF Min Temp"),
+            (latest("*_tmax.png"),             "ECMWF Max Temp"),
+            (latest("maxar_precip_7d_*.png"),  "Maxar 7d Precip"),
+            (latest("maxar_precip_norm_*.png"),"Maxar % Normal"),
+            (latest("maxar_temp_850_*.png"),   "Maxar 850mb Temp"),
+        ], n_cols=6)
 
-    st.markdown("---")
-    st.markdown('<div class="card-label">Maxar WeatherDesk -- Ensemble Precip (ECM vs GFS)</div>', unsafe_allow_html=True)
-    c1, c2, c3 = st.columns(3, gap="medium")
-    EN_WINDOWS = {"Day 1-5": "day1-5", "Day 6-10": "day6-10", "Day 11-15": "day11-15"}
-    en_window  = st.radio("enw", list(EN_WINDOWS), horizontal=True, label_visibility="collapsed", key="en_win")
-    en_var     = st.radio("env", ["Precip (mm)", "% of Normal"], horizontal=True, label_visibility="collapsed", key="en_var")
-    en_var_key = "precip_mm" if en_var == "Precip (mm)" else "precip_pct_normal"
-    w          = EN_WINDOWS[en_window]
-    d_en       = latest_date_from(f"maxar_en_ecm_{en_var_key}_{w}_", ".png")
+    # ── Weekly Precip Anomaly ────────────────────────────────────────────────
+    with st.expander("Weekly Precip Anomaly — ECMWF Extended", expanded=False):
+        show_grid([
+            (latest("opencharts_anom_tp_w1_*.png"), "Week 1"),
+            (latest("opencharts_anom_tp_w2_*.png"), "Week 2"),
+            (latest("opencharts_anom_tp_w3_*.png"), "Week 3"),
+            (latest("opencharts_anom_tp_w4_*.png"), "Week 4"),
+        ], n_cols=4)
 
-    with c1:
-        st.caption("ECM Ensemble")
-        if d_en:
-            show(os.path.join(MAPS_DIR, f"maxar_en_ecm_{en_var_key}_{w}_{d_en}.png"))
-        else:
-            st.caption("No data")
-    with c2:
-        st.caption("GFS Ensemble")
-        d_gfs = latest_date_from(f"maxar_en_gfs_{en_var_key}_{w}_", ".png")
-        if d_gfs:
-            show(os.path.join(MAPS_DIR, f"maxar_en_gfs_{en_var_key}_{w}_{d_gfs}.png"))
-        else:
-            st.caption("No data")
+    # ── Weekly Temp Anomaly ──────────────────────────────────────────────────
+    with st.expander("Weekly Temp Anomaly — ECMWF Extended", expanded=False):
+        show_grid([
+            (latest("opencharts_anom_2t_w1_*.png"), "Week 1"),
+            (latest("opencharts_anom_2t_w2_*.png"), "Week 2"),
+            (latest("opencharts_anom_2t_w3_*.png"), "Week 3"),
+            (latest("opencharts_anom_2t_w4_*.png"), "Week 4"),
+        ], n_cols=4)
 
+    # ── Ensemble Precip mm ───────────────────────────────────────────────────
+    with st.expander("Ensemble Precip (mm) — ECM vs GFS", expanded=False):
+        show_grid([
+            (latest("maxar_en_ecm_precip_mm_day1-5_*.png"),   "ECM Day 1-5"),
+            (latest("maxar_en_ecm_precip_mm_day6-10_*.png"),  "ECM Day 6-10"),
+            (latest("maxar_en_ecm_precip_mm_day11-15_*.png"), "ECM Day 11-15"),
+            (latest("maxar_en_gfs_precip_mm_day1-5_*.png"),   "GFS Day 1-5"),
+            (latest("maxar_en_gfs_precip_mm_day6-10_*.png"),  "GFS Day 6-10"),
+            (latest("maxar_en_gfs_precip_mm_day11-15_*.png"), "GFS Day 11-15"),
+        ], n_cols=6)
 
-# ── Tab 3: Frost Alert ───────────────────────────────────────────────────────
-with tab3:
-    st.markdown('<div class="card-label">CPTEC -- Previsao de Geadas (Brazil Frost Forecast)</div>', unsafe_allow_html=True)
-    c1, c2, c3 = st.columns(3, gap="medium")
-    for col, day in zip([c1, c2, c3], [1, 2, 3]):
-        with col:
-            st.caption(f"Day {day}")
-            d = latest_date_from(f"static_geada_d{day}_", ".png")
-            if d:
-                show(os.path.join(MAPS_DIR, f"static_geada_d{day}_{d}.png"))
+    # ── Ensemble % Normal ────────────────────────────────────────────────────
+    with st.expander("Ensemble % of Normal — ECM vs GFS", expanded=False):
+        show_grid([
+            (latest("maxar_en_ecm_precip_pct_normal_day1-5_*.png"),   "ECM Day 1-5"),
+            (latest("maxar_en_ecm_precip_pct_normal_day6-10_*.png"),  "ECM Day 6-10"),
+            (latest("maxar_en_ecm_precip_pct_normal_day11-15_*.png"), "ECM Day 11-15"),
+            (latest("maxar_en_gfs_precip_pct_normal_day1-5_*.png"),   "GFS Day 1-5"),
+            (latest("maxar_en_gfs_precip_pct_normal_day6-10_*.png"),  "GFS Day 6-10"),
+            (latest("maxar_en_gfs_precip_pct_normal_day11-15_*.png"), "GFS Day 11-15"),
+        ], n_cols=6)
+
+    # ── Seasonal / ENSO ──────────────────────────────────────────────────────
+    with st.expander("Seasonal / ENSO — ECMWF SEAS5", expanded=False):
+        show_grid([
+            (latest("opencharts_seas_m1_*.png"), "Month 1"),
+            (latest("opencharts_seas_m2_*.png"), "Month 2"),
+            (latest("opencharts_seas_m3_*.png"), "Month 3"),
+            (latest("opencharts_seas_m4_*.png"), "Month 4"),
+            (latest("opencharts_enso_*.png"),    "Nino 3.4 Plumes"),
+        ], n_cols=5)
+
+    # ── ERA5 ─────────────────────────────────────────────────────────────────
+    with st.expander("ERA5 Reanalysis — 30-Day Cumulative Precip", expanded=False):
+        left, _ = st.columns([1, 2])
+        with left:
+            f = latest("era5_precip30d_*.png")
+            if f:
+                st.image(f, use_container_width=True)
+                st.caption(os.path.basename(f).replace("era5_precip30d_", "").replace(".png", ""))
             else:
-                st.caption("Run Ingest/ingest_static.py")
+                st.caption("Run Ingest/ingest_era5.py")
 
 
-# ── Tab 4: Observed ──────────────────────────────────────────────────────────
-with tab4:
-    left, right = st.columns(2, gap="large")
-
-    CPC_OPTS = {
-        "7-Day Observed":       "cpc_7d_obs",
-        "7-Day Anomaly":        "cpc_7d_anom",
-        "30-Day % of Normal":   "cpc_30d_pnorm",
-    }
-    GFS_OPTS = {
-        "Week 1 Total Precip":  "gfs_w1",
-        "Week 2 Total Precip":  "gfs_w2",
-        "GEFS Anom Days 1-7":   "gefs_anom_d7",
-        "GEFS Anom Days 8-14":  "gefs_anom_d14",
-    }
-
-    with left:
-        st.markdown('<div class="card-label">CPC/NOAA -- Observed Precipitation (S. America)</div>', unsafe_allow_html=True)
-        cpc_p = st.radio("cpc", list(CPC_OPTS), horizontal=True, label_visibility="collapsed", key="cpc")
-        d = latest_date_from(f"static_{CPC_OPTS[cpc_p]}_", ".png")
-        if d:
-            show(os.path.join(MAPS_DIR, f"static_{CPC_OPTS[cpc_p]}_{d}.png"))
-        else:
-            st.caption("Run Ingest/ingest_static.py")
-
-    with right:
-        st.markdown('<div class="card-label">GFS / GEFS -- Model Forecast (S. America)</div>', unsafe_allow_html=True)
-        gfs_p = st.radio("gfs", list(GFS_OPTS), horizontal=True, label_visibility="collapsed", key="gfs")
-        d = latest_date_from(f"static_{GFS_OPTS[gfs_p]}_", ".png")
-        if d:
-            show(os.path.join(MAPS_DIR, f"static_{GFS_OPTS[gfs_p]}_{d}.png"))
-        else:
-            st.caption("Run Ingest/ingest_static.py")
+# ══ VIETNAM ══════════════════════════════════════════════════════════════════
+with tab_vn:
+    st.caption("Vietnam (Robusta) — coming soon.")
 
 
-# ── Tab 5: Seasonal / ENSO ───────────────────────────────────────────────────
-with tab5:
-    left, right = st.columns(2, gap="large")
-
-    MONTH_OPTS = {"Month 1": "m1", "Month 2": "m2", "Month 3": "m3", "Month 4": "m4"}
-
-    with left:
-        st.markdown('<div class="card-label">ECMWF SEAS5 -- Seasonal Rainfall Forecast (S. America)</div>', unsafe_allow_html=True)
-        mo = st.radio("mo", list(MONTH_OPTS), horizontal=True, label_visibility="collapsed", key="seas")
-        d  = latest_date_from(f"opencharts_seas_{MONTH_OPTS[mo]}_", ".png")
-        if d:
-            show(os.path.join(MAPS_DIR, f"opencharts_seas_{MONTH_OPTS[mo]}_{d}.png"))
-        else:
-            st.caption("Run Ingest/ingest_opencharts.py")
-
-    with right:
-        st.markdown('<div class="card-label">ECMWF SEAS5 -- ENSO Nino 3.4 Plumes</div>', unsafe_allow_html=True)
-        enso_f = latest(f"opencharts_enso_*.png")
-        show(enso_f)
-        if enso_f:
-            st.caption(os.path.basename(enso_f).replace("opencharts_enso_", "").replace(".png", ""))
-
-
-# ── Tab 6: ERA5 ──────────────────────────────────────────────────────────────
-with tab6:
-    left6, _ = st.columns([1, 1])
-    with left6:
-        st.markdown('<div class="card-label">ERA5 Reanalysis -- 30-Day Cumulative Precip</div>', unsafe_allow_html=True)
-        era5_files = sorted(glob.glob(os.path.join(MAPS_DIR, "era5_precip30d_*.png")))
-        if era5_files:
-            show(era5_files[-1])
-            fname = os.path.basename(era5_files[-1])
-            st.caption(f"Generated: {fname.replace('era5_precip30d_', '').replace('.png', '')}")
-        else:
-            st.caption("Run Ingest/ingest_era5.py")
+# ══ IVORY COAST ══════════════════════════════════════════════════════════════
+with tab_ic:
+    st.caption("Ivory Coast (Cocoa) — coming soon.")
