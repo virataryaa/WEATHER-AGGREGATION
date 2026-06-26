@@ -54,70 +54,81 @@ def show_grid(items, n_cols):
                 st.caption("—")
 
 
-tab_br, tab_vn, tab_ic = st.tabs(["Brazil (Arabica)", "Vietnam (Robusta)", "Ivory Coast (Cocoa)"])
+def region_tab(rk):
+    """Render a full region tab given a region key (br / wa / vn / co)."""
 
-
-# ══ BRAZIL ═══════════════════════════════════════════════════════════════════
-with tab_br:
+    # ECMWF maps — Brazil uses no prefix, others use rk_ prefix
+    ecmwf_prefix = "" if rk == "br" else f"{rk}_"
 
     sec("Short-term Forecast — ECMWF Open Data")
     show_grid([
-        (latest("*_precip.png"),  "Precip"),
-        (latest("*_tmin.png"),    "Min Temp"),
-        (latest("*_tmax.png"),    "Max Temp"),
+        (latest(f"{ecmwf_prefix}*_precip.png"), "Precip"),
+        (latest(f"{ecmwf_prefix}*_tmin.png"),   "Min Temp"),
+        (latest(f"{ecmwf_prefix}*_tmax.png"),   "Max Temp"),
     ], n_cols=3)
 
-    sec("Ensemble Precip (mm) — Maxar ECM vs GFS")
-    show_grid([
-        (latest("maxar_en_ecm_precip_mm_day1-5_*.png"),   "ECM Day 1-5"),
-        (latest("maxar_en_ecm_precip_mm_day6-10_*.png"),  "ECM Day 6-10"),
-        (latest("maxar_en_ecm_precip_mm_day11-15_*.png"), "ECM Day 11-15"),
-        (latest("maxar_en_gfs_precip_mm_day1-5_*.png"),   "GFS Day 1-5"),
-        (latest("maxar_en_gfs_precip_mm_day6-10_*.png"),  "GFS Day 6-10"),
-        (latest("maxar_en_gfs_precip_mm_day11-15_*.png"), "GFS Day 11-15"),
-    ], n_cols=6)
-
-    sec("Ensemble % of Normal — Maxar ECM vs GFS")
-    show_grid([
-        (latest("maxar_en_ecm_precip_pct_normal_day1-5_*.png"),   "ECM Day 1-5"),
-        (latest("maxar_en_ecm_precip_pct_normal_day6-10_*.png"),  "ECM Day 6-10"),
-        (latest("maxar_en_ecm_precip_pct_normal_day11-15_*.png"), "ECM Day 11-15"),
-        (latest("maxar_en_gfs_precip_pct_normal_day1-5_*.png"),   "GFS Day 1-5"),
-        (latest("maxar_en_gfs_precip_pct_normal_day6-10_*.png"),  "GFS Day 6-10"),
-        (latest("maxar_en_gfs_precip_pct_normal_day11-15_*.png"), "GFS Day 11-15"),
-    ], n_cols=6)
+    # Maxar OP — Brazil uses no prefix, others use rk_ prefix
+    mx_prefix = "" if rk == "br" else f"{rk}_"
 
     sec("Maxar OP — 7-Day Summary")
     show_grid([
-        (latest("maxar_precip_7d_*.png"),  "7-Day Precip"),
-        (latest("maxar_precip_norm_*.png"),"% of Normal"),
-        (latest("maxar_temp_850_*.png"),   "850mb Temp"),
-        (latest("maxar_temp_2m_*.png"),    "2m Temp"),
-        (latest("maxar_dewpoint_*.png"),   "Dewpoint"),
+        (latest(f"maxar_{mx_prefix}precip_7d_*.png"),  "7-Day Precip"),
+        (latest(f"maxar_{mx_prefix}precip_norm_*.png"),"% of Normal"),
+        (latest(f"maxar_{mx_prefix}temp_850_*.png"),   "850mb Temp"),
+        (latest(f"maxar_{mx_prefix}temp_2m_*.png"),    "2m Temp"),
+        (latest(f"maxar_{mx_prefix}dewpoint_*.png"),   "Dewpoint"),
     ], n_cols=5)
+
+    # Maxar EN — Brazil has no region slug, others have rk_ in the middle
+    en_slug = "" if rk == "br" else f"{rk}_"
+
+    sec("Ensemble Precip (mm) — ECM vs GFS")
+    show_grid([
+        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day1-5_*.png"),   "ECM Day 1-5"),
+        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day6-10_*.png"),  "ECM Day 6-10"),
+        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day11-15_*.png"), "ECM Day 11-15"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day1-5_*.png"),   "GFS Day 1-5"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day6-10_*.png"),  "GFS Day 6-10"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day11-15_*.png"), "GFS Day 11-15"),
+    ], n_cols=6)
+
+    sec("Ensemble % of Normal — ECM vs GFS")
+    show_grid([
+        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day1-5_*.png"),   "ECM Day 1-5"),
+        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day6-10_*.png"),  "ECM Day 6-10"),
+        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day11-15_*.png"), "ECM Day 11-15"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day1-5_*.png"),   "GFS Day 1-5"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day6-10_*.png"),  "GFS Day 6-10"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day11-15_*.png"), "GFS Day 11-15"),
+    ], n_cols=6)
+
+    # OpenCharts anomaly — Brazil uses no prefix, others use rk_ prefix
+    oc_prefix = "" if rk == "br" else f"{rk}_"
 
     sec("Weekly Precip Anomaly — ECMWF Extended")
     show_grid([
-        (latest("opencharts_anom_tp_w1_*.png"), "Week 1"),
-        (latest("opencharts_anom_tp_w2_*.png"), "Week 2"),
-        (latest("opencharts_anom_tp_w3_*.png"), "Week 3"),
-        (latest("opencharts_anom_tp_w4_*.png"), "Week 4"),
+        (latest(f"opencharts_{oc_prefix}anom_tp_w1_*.png"), "Week 1"),
+        (latest(f"opencharts_{oc_prefix}anom_tp_w2_*.png"), "Week 2"),
+        (latest(f"opencharts_{oc_prefix}anom_tp_w3_*.png"), "Week 3"),
+        (latest(f"opencharts_{oc_prefix}anom_tp_w4_*.png"), "Week 4"),
     ], n_cols=4)
 
     sec("Weekly Temp Anomaly — ECMWF Extended")
     show_grid([
-        (latest("opencharts_anom_2t_w1_*.png"), "Week 1"),
-        (latest("opencharts_anom_2t_w2_*.png"), "Week 2"),
-        (latest("opencharts_anom_2t_w3_*.png"), "Week 3"),
-        (latest("opencharts_anom_2t_w4_*.png"), "Week 4"),
+        (latest(f"opencharts_{oc_prefix}anom_2t_w1_*.png"), "Week 1"),
+        (latest(f"opencharts_{oc_prefix}anom_2t_w2_*.png"), "Week 2"),
+        (latest(f"opencharts_{oc_prefix}anom_2t_w3_*.png"), "Week 3"),
+        (latest(f"opencharts_{oc_prefix}anom_2t_w4_*.png"), "Week 4"),
     ], n_cols=4)
 
-    sec("Frost Alert — CPTEC Geadas")
-    show_grid([
-        (latest("static_geada_d1_*.png"), "Day 1"),
-        (latest("static_geada_d2_*.png"), "Day 2"),
-        (latest("static_geada_d3_*.png"), "Day 3"),
-    ], n_cols=3)
+    # Brazil-only sections
+    if rk == "br":
+        sec("Frost Alert — CPTEC Geadas")
+        show_grid([
+            (latest("static_geada_d1_*.png"), "Day 1"),
+            (latest("static_geada_d2_*.png"), "Day 2"),
+            (latest("static_geada_d3_*.png"), "Day 3"),
+        ], n_cols=3)
 
     sec("Observed — CPC / NOAA + GFS")
     show_grid([
@@ -128,30 +139,39 @@ with tab_br:
         (latest("static_gfs_w2_*.png"),        "GFS Week 2"),
     ], n_cols=5)
 
-    sec("Seasonal / ENSO — ECMWF SEAS5")
-    show_grid([
-        (latest("opencharts_seas_m1_*.png"), "Month 1"),
-        (latest("opencharts_seas_m2_*.png"), "Month 2"),
-        (latest("opencharts_seas_m3_*.png"), "Month 3"),
-        (latest("opencharts_seas_m4_*.png"), "Month 4"),
-        (latest("opencharts_enso_*.png"),    "Nino 3.4 Plumes"),
-    ], n_cols=5)
+    if rk == "br":
+        sec("Seasonal / ENSO — ECMWF SEAS5")
+        show_grid([
+            (latest("opencharts_seas_m1_*.png"), "Month 1"),
+            (latest("opencharts_seas_m2_*.png"), "Month 2"),
+            (latest("opencharts_seas_m3_*.png"), "Month 3"),
+            (latest("opencharts_seas_m4_*.png"), "Month 4"),
+            (latest("opencharts_enso_*.png"),    "Nino 3.4 Plumes"),
+        ], n_cols=5)
 
-    sec("ERA5 Reanalysis — 30-Day Cumulative Precip")
-    left, _ = st.columns([1, 2])
-    with left:
-        f = latest("era5_precip30d_*.png")
-        if f:
-            st.image(f, use_container_width=True)
-        else:
-            st.caption("Run Ingest/ingest_era5.py")
+        sec("ERA5 Reanalysis — 30-Day Cumulative Precip")
+        left, _ = st.columns([1, 2])
+        with left:
+            f = latest("era5_precip30d_*.png")
+            if f:
+                st.image(f, use_container_width=True)
+            else:
+                st.caption("Run Ingest/ingest_era5.py")
 
 
-# ══ VIETNAM ══════════════════════════════════════════════════════════════════
+# ─────────────────────────────────────────────────────────────────────────────
+tab_br, tab_co, tab_vn, tab_ic = st.tabs([
+    "Brazil (Arabica)", "Colombia (Arabica)", "Vietnam (Robusta)", "Ivory Coast (Cocoa)"
+])
+
+with tab_br:
+    region_tab("br")
+
+with tab_co:
+    region_tab("co")
+
 with tab_vn:
-    st.caption("Vietnam (Robusta) — coming soon.")
+    region_tab("vn")
 
-
-# ══ IVORY COAST ══════════════════════════════════════════════════════════════
 with tab_ic:
-    st.caption("Ivory Coast (Cocoa) — coming soon.")
+    region_tab("wa")

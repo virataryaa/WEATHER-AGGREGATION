@@ -129,16 +129,56 @@ def fetch_enso_plumes(run_date):
         print(f"skipped ({e})")
 
 
+# Extra regions: (region_key, projection, label)
+REGION_PROJECTIONS = [
+    ("wa", "opencharts_africa",        "West Africa"),
+    ("vn", "opencharts_tropics",        "Vietnam / SE Asia"),
+    ("co", "opencharts_south_america", "Colombia"),
+]
+
+
+def fetch_weekly_anomaly_region(product, key, region_key, projection, run_date):
+    print(f"\n  [{region_key}] {key.upper()} weekly anomaly ({projection}) ...")
+    try:
+        first_step = discover_first_step(product, projection=projection)
+    except Exception as e:
+        print(f"    Step discovery failed: {e}")
+        return
+    saved = 0
+    for i in range(4):
+        step  = first_step + i * 168
+        label = f"w{i+1}"
+        out   = os.path.join(MAPS_DIR, f"opencharts_{region_key}_anom_{key}_{label}_{run_date}.png")
+        print(f"    +{step}h ({label}) ...", end=" ", flush=True)
+        try:
+            data = fetch_image_bytes(product, step, projection=projection)
+            with open(out, "wb") as f:
+                f.write(data)
+            print(f"ok  ({len(data)//1024} KB)")
+            saved += 1
+        except Exception as e:
+            print(f"skipped ({e})")
+        time.sleep(3)
+    print(f"    Saved {saved}/4")
+
+
 def main():
     run_date = date.today().isoformat()
     print(f"\n{'='*55}")
     print(f"  ECMWF OpenCharts Ingest  |  {run_date}")
     print(f"{'='*55}")
 
+    # Brazil
     fetch_weekly_anomaly("extended-anomaly-tp", "tp", run_date)
     fetch_weekly_anomaly("extended-anomaly-2t", "2t", run_date)
     fetch_seasonal_rain(run_date)
     fetch_enso_plumes(run_date)
+
+    # Extra regions
+    for region_key, projection, label in REGION_PROJECTIONS:
+        print(f"\n  -- {label} --")
+        fetch_weekly_anomaly_region("extended-anomaly-tp", "tp", region_key, projection, run_date)
+        fetch_weekly_anomaly_region("extended-anomaly-2t", "2t", region_key, projection, run_date)
 
     print(f"\n{'='*55}")
     print(f"  Done.\n")

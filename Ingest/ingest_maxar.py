@@ -135,6 +135,73 @@ def fetch_en(run_date):
                     print(f"  [en/{model}/{code}/{window_label}] download error: {e}")
 
 
+# ── Regional runs ────────────────────────────────────────────────────────────
+# region_key -> (Maxar region code, display name)
+EXTRA_REGIONS = {
+    "wa": ("WA", "West Africa"),
+    "vn": ("SE", "Vietnam / SE Asia"),
+    "co": ("CO", "Colombia / N. S. America"),
+}
+
+
+def fetch_op_region(region_key, maxar_region, run_date):
+    for key, (code, duration, label) in OP_VARIABLES.items():
+        params = {"model": "ecm", "type": "op", "run": "00",
+                  "region": maxar_region, "variable": code}
+        try:
+            data   = api_get(params)
+        except Exception as e:
+            print(f"  [{region_key}/op/{key}] API error: {e}")
+            continue
+        by_path   = data.get("models", {}).get("byPath", {})
+        available = [p for p, v in by_path.items() if v.get("available")]
+        preferred = [p for p in available if duration in p]
+        chosen    = preferred or available
+        if not chosen:
+            print(f"  [{region_key}/op/{key}] no images")
+            continue
+        path = chosen[len(chosen) // 2]
+        try:
+            content = download_image(path)
+            out = os.path.join(MAPS_DIR, f"maxar_{region_key}_{key}_{run_date}.png")
+            with open(out, "wb") as f:
+                f.write(content)
+            print(f"  [{region_key}/op/{key}] -> {os.path.basename(out)}")
+        except Exception as e:
+            print(f"  [{region_key}/op/{key}] download error: {e}")
+
+
+def fetch_en_region(region_key, maxar_region, run_date):
+    for model in EN_MODELS:
+        for code, var_label in EN_VARIABLES.items():
+            params = {"model": model, "type": "EN", "run": "00",
+                      "region": maxar_region, "variable": code}
+            try:
+                data = api_get(params)
+            except Exception as e:
+                print(f"  [{region_key}/en/{model}/{code}] API error: {e}")
+                continue
+            init_time = data.get("initTime", "")
+            if not init_time:
+                continue
+            init_dt = _parse_dt(init_time)
+            by_path = data.get("models", {}).get("byPath", {})
+            for window_label, day_end in EN_WINDOWS:
+                path = find_window_frame(by_path, init_dt, day_end)
+                if path is None:
+                    print(f"  [{region_key}/en/{model}/{code}/{window_label}] not found")
+                    continue
+                out = os.path.join(MAPS_DIR,
+                    f"maxar_en_{model}_{region_key}_{var_label}_{window_label}_{run_date}.png")
+                try:
+                    content = download_image(path)
+                    with open(out, "wb") as f:
+                        f.write(content)
+                    print(f"  [{region_key}/en/{model}/{code}/{window_label}] -> {os.path.basename(out)}")
+                except Exception as e:
+                    print(f"  [{region_key}/en/{model}/{code}/{window_label}] error: {e}")
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
@@ -143,13 +210,19 @@ def main():
     print(f"  Maxar Ingest  |  {run_date}")
     print(f"{'='*55}")
 
-    print("\n  [Operational]")
+    print("\n  [Brazil — Operational]")
     for key, (code, duration, label) in OP_VARIABLES.items():
         print(f"  {label} ...")
         fetch_op(key, code, duration, run_date)
 
-    print("\n  [Ensemble Period Summary]")
+    print("\n  [Brazil — Ensemble Period Summary]")
     fetch_en(run_date)
+
+    for region_key, (maxar_region, display_name) in EXTRA_REGIONS.items():
+        print(f"\n  [{display_name} — Operational]")
+        fetch_op_region(region_key, maxar_region, run_date)
+        print(f"\n  [{display_name} — Ensemble]")
+        fetch_en_region(region_key, maxar_region, run_date)
 
     print(f"\n[{datetime.now():%H:%M:%S}] Done.\n")
 

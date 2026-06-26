@@ -35,6 +35,43 @@ ZONE_LABELS = {
     "Rondonia (Robusta)":  {"lat": (-12.5, -10.5), "lon": (-64.5, -62.0)},
 }
 
+REGIONS = {
+    "wa": {
+        "name": "West Africa",
+        "bbox": {"lat_min": 0.0, "lat_max": 12.0, "lon_min": -10.0, "lon_max": 8.0},
+        "figsize": (5, 4),
+        "zones": {
+            "Cote d'Ivoire": {"lat": (4.5, 8.0),  "lon": (-8.0, -3.0)},
+            "Ghana":         {"lat": (5.0, 9.0),   "lon": (-3.0,  1.0)},
+            "Nigeria":       {"lat": (5.0, 8.0),   "lon": ( 3.0,  8.0)},
+            "Cameroon":      {"lat": (3.0, 6.0),   "lon": ( 9.0, 14.0)},
+        },
+    },
+    "vn": {
+        "name": "Vietnam",
+        "bbox": {"lat_min": 8.0, "lat_max": 24.0, "lon_min": 100.0, "lon_max": 112.0},
+        "figsize": (3, 5),
+        "zones": {
+            "Dak Lak":   {"lat": (12.0, 13.5), "lon": (107.5, 108.8)},
+            "Dak Nong":  {"lat": (11.5, 12.5), "lon": (107.0, 108.2)},
+            "Lam Dong":  {"lat": (11.0, 12.2), "lon": (107.5, 108.5)},
+            "Gia Lai":   {"lat": (13.0, 14.5), "lon": (107.5, 108.8)},
+        },
+    },
+    "co": {
+        "name": "Colombia",
+        "bbox": {"lat_min": -5.0, "lat_max": 13.0, "lon_min": -80.0, "lon_max": -66.0},
+        "figsize": (4, 5),
+        "zones": {
+            "Huila":     {"lat": (1.5,  3.5), "lon": (-76.5, -74.5)},
+            "Narino":    {"lat": (0.5,  2.5), "lon": (-78.0, -76.0)},
+            "Antioquia": {"lat": (5.5,  7.5), "lon": (-76.5, -74.5)},
+            "Caldas":    {"lat": (4.5,  5.5), "lon": (-76.0, -74.5)},
+            "Cauca":     {"lat": (1.5,  3.5), "lon": (-77.5, -75.5)},
+        },
+    },
+}
+
 MAP_CONFIGS = {
     "precip": {
         "label":   "Precipitation (12-24h)",
@@ -170,6 +207,69 @@ def make_map(da_sa, msl_sa, param, run_date):
     return out_path
 
 
+def make_region_map(da, msl, param, region_key, region_cfg, run_date):
+    cfg  = MAP_CONFIGS[param]
+    bbox = region_cfg["bbox"]
+    da_r  = clip(da,  bbox)
+    msl_r = clip(msl, bbox)
+
+    fig = plt.figure(figsize=region_cfg["figsize"], facecolor="#ffffff")
+    ax  = plt.axes(projection=ccrs.PlateCarree(), facecolor="#ccdff0")
+    ax.set_extent([bbox["lon_min"], bbox["lon_max"], bbox["lat_min"], bbox["lat_max"]],
+                  crs=ccrs.PlateCarree())
+
+    ax.add_feature(cfeature.LAND.with_scale("50m"),      facecolor="#f0ece4", zorder=0)
+    ax.add_feature(cfeature.STATES.with_scale("50m"),    edgecolor="#b0b8c0", linewidth=0.4, zorder=1)
+    ax.add_feature(cfeature.BORDERS.with_scale("50m"),   edgecolor="#7a8490", linewidth=0.8, zorder=1)
+    ax.add_feature(cfeature.COASTLINE.with_scale("50m"), edgecolor="#7a8490", linewidth=0.8, zorder=1)
+
+    cf = ax.contourf(
+        da_r.longitude.values, da_r.latitude.values, da_r.values,
+        levels=cfg["levels"], cmap=cfg["cmap"], alpha=0.82,
+        transform=ccrs.PlateCarree(), extend=cfg["extend"], zorder=2,
+    )
+
+    msl_levels = np.arange(
+        int(msl_r.values.min()) - (int(msl_r.values.min()) % 2),
+        int(msl_r.values.max()) + 4, 2,
+    )
+    cs = ax.contour(
+        msl_r.longitude.values, msl_r.latitude.values, msl_r.values,
+        levels=msl_levels, colors="#2d3748", linewidths=0.5, alpha=0.45,
+        transform=ccrs.PlateCarree(), zorder=3,
+    )
+    ax.clabel(cs, fmt="%d", fontsize=5.5, colors="#2d3748", inline=True)
+
+    for zone, bounds in region_cfg["zones"].items():
+        clat = (bounds["lat"][0] + bounds["lat"][1]) / 2
+        clon = (bounds["lon"][0] + bounds["lon"][1]) / 2
+        ax.text(clon, clat, zone, fontsize=5.5, color="#1a202c",
+                ha="center", va="center", transform=ccrs.PlateCarree(), zorder=4,
+                bbox=dict(boxstyle="round,pad=0.2", facecolor="white",
+                          alpha=0.72, edgecolor="#cbd5e0", linewidth=0.4))
+
+    cbar = plt.colorbar(cf, ax=ax, orientation="vertical", pad=0.02, shrink=0.78, aspect=28)
+    cbar.set_label(cfg["unit"], color="#4a5568", fontsize=7)
+    plt.setp(cbar.ax.yaxis.get_ticklabels(), color="#4a5568", fontsize=6)
+
+    gl = ax.gridlines(draw_labels=True, linewidth=0.2, color="#c0c8d0", alpha=0.6, linestyle="--")
+    gl.top_labels = False; gl.right_labels = False
+    gl.xlabel_style = {"color": "#718096", "fontsize": 5.5}
+    gl.ylabel_style = {"color": "#718096", "fontsize": 5.5}
+
+    fig.text(0.5, 0.97, f"{region_cfg['name']} -- {cfg['label']}",
+             ha="center", color="#1a202c", fontsize=10, fontweight="bold")
+    fig.text(0.5, 0.935, f"ECMWF  |  {run_date}",
+             ha="center", color="#718096", fontsize=7)
+    fig.text(0.5, 0.005, "ECMWF Open Data · CC-BY-4.0",
+             ha="center", color="#a0aec0", fontsize=6)
+
+    out_path = os.path.join(MAPS_DIR, f"{region_key}_{run_date}_{param}.png")
+    plt.savefig(out_path, dpi=100, bbox_inches="tight", facecolor="#ffffff")
+    plt.close()
+    print(f"[{datetime.now():%H:%M:%S}] Map saved -> {os.path.basename(out_path)}")
+
+
 def update_database(run_date, stats):
     row = {"date": pd.Timestamp(run_date), **stats}
     new_row = pd.DataFrame([row])
@@ -229,6 +329,12 @@ def main():
     make_map(tmax_sa, msl_sa, "tmax",   run_date)
 
     update_database(run_date, stats)
+
+    # Additional regions — same GRIB, different clips
+    print(f"[{datetime.now():%H:%M:%S}] Generating region maps (WA / VN / CO)...")
+    for rkey, rcfg in REGIONS.items():
+        for param, da in [("precip", tp_mm), ("tmin", tmin_c), ("tmax", tmax_c)]:
+            make_region_map(da, msl_hpa, param, rkey, rcfg, run_date)
 
     if os.path.exists(GRIB_FILE):
         os.remove(GRIB_FILE)
