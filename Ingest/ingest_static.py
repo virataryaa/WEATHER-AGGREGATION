@@ -54,12 +54,15 @@ STATIC_SOURCES = [
 ]
 
 
-def download_as_png(url, hdrs=None):
+def download_as_png(url, hdrs=None, max_width: int = 1000):
     r = requests.get(url, headers=hdrs or HEADERS, timeout=20)
     r.raise_for_status()
     img = Image.open(io.BytesIO(r.content)).convert("RGB")
+    if img.width > max_width:
+        ratio = max_width / img.width
+        img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
     buf = io.BytesIO()
-    img.save(buf, format="PNG")
+    img.save(buf, format="PNG", optimize=True, compress_level=7)
     return buf.getvalue()
 
 

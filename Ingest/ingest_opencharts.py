@@ -9,11 +9,21 @@ Products fetched:
   - seasonal ENSO plumes   : Nino 3.4 outlook                 -> opencharts_enso_{date}.png
 """
 
+import io
 import os
 import re
 import time
 import requests
 from datetime import date
+from PIL import Image
+
+
+def save_compressed(data: bytes, out_path: str, max_width: int = 900):
+    img = Image.open(io.BytesIO(data)).convert("RGB")
+    if img.width > max_width:
+        ratio = max_width / img.width
+        img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
+    img.save(out_path, "PNG", optimize=True, compress_level=7)
 
 BASE     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAPS_DIR = os.path.join(BASE, "Database", "maps")
@@ -82,9 +92,8 @@ def fetch_weekly_anomaly(product, key, run_date):
         print(f"    +{step}h ({label}) ...", end=" ", flush=True)
         try:
             data = fetch_image_bytes(product, step, projection="opencharts_south_america")
-            with open(out, "wb") as f:
-                f.write(data)
-            print(f"ok  ({len(data)//1024} KB)")
+            save_compressed(data, out)
+            print(f"ok  ({os.path.getsize(out)//1024} KB)")
             saved += 1
         except Exception as e:
             print(f"skipped ({e})")
@@ -104,9 +113,8 @@ def fetch_seasonal_rain(run_date):
         print(f"    step={step} ({label}) ...", end=" ", flush=True)
         try:
             data = fetch_image_bytes(product, step, extra_params=extra)
-            with open(out, "wb") as f:
-                f.write(data)
-            print(f"ok  ({len(data)//1024} KB)")
+            save_compressed(data, out)
+            print(f"ok  ({os.path.getsize(out)//1024} KB)")
             saved += 1
         except Exception as e:
             print(f"skipped ({e})")
@@ -122,9 +130,8 @@ def fetch_enso_plumes(run_date):
     print(f"\n  ENSO Nino 3.4 plumes ...", end=" ", flush=True)
     try:
         data = fetch_image_bytes(product, step=0, extra_params=extra)
-        with open(out, "wb") as f:
-            f.write(data)
-        print(f"ok  ({len(data)//1024} KB)")
+        save_compressed(data, out)
+        print(f"ok  ({os.path.getsize(out)//1024} KB)")
     except Exception as e:
         print(f"skipped ({e})")
 
@@ -157,9 +164,8 @@ def fetch_weekly_anomaly_region(product, key, region_key, projection, run_date):
         print(f"    +{step}h ({label}) ...", end=" ", flush=True)
         try:
             data = fetch_image_bytes(product, step, projection=projection)
-            with open(out, "wb") as f:
-                f.write(data)
-            print(f"ok  ({len(data)//1024} KB)")
+            save_compressed(data, out)
+            print(f"ok  ({os.path.getsize(out)//1024} KB)")
             saved += 1
         except Exception as e:
             print(f"skipped ({e})")

@@ -2,6 +2,7 @@
 setlocal
 
 set BASE=C:\Users\virat.arya\ETG\SoftsDatabase - Documents\Database\Hardmine\Non Fundamental\Weather\AGGREGATION OF WEATHER
+set MAPS=%BASE%\Database\maps
 
 echo.
 echo ========================================
@@ -27,6 +28,10 @@ if %ERRORLEVEL% NEQ 0 echo [ERROR] Static ingest failed.
 echo [5/5] ERA5 Reanalysis...
 python "%BASE%\Ingest\ingest_era5.py"
 if %ERRORLEVEL% NEQ 0 echo [ERROR] ERA5 ingest failed.
+
+echo [Purge] Deleting maps older than 2 days...
+forfiles /P "%MAPS%" /M *.png /D -2 /C "cmd /c del @path" 2>nul
+echo [Purge] Done.
 
 cd /d "%BASE%"
 git add Database\weather_mg.parquet
