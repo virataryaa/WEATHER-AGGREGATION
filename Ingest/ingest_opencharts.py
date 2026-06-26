@@ -131,9 +131,14 @@ def fetch_enso_plumes(run_date):
 
 # Extra regions: (region_key, projection, label)
 REGION_PROJECTIONS = [
-    ("wa", "opencharts_africa",        "West Africa"),
+    ("wa", "opencharts_africa",         "West Africa"),
     ("vn", "opencharts_tropics",        "Vietnam / SE Asia"),
-    ("co", "opencharts_south_america", "Colombia"),
+    ("co", "opencharts_south_america",  "Colombia"),
+    ("ca", "opencharts_north_america",  "Central America"),
+    ("ec", "opencharts_south_america",  "Ecuador"),
+    ("in", "opencharts_south_asia",     "India"),
+    ("th", "opencharts_tropics",        "Thailand"),
+    ("au", "opencharts_australasia",    "Australia"),
 ]
 
 

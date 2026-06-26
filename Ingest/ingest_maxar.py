@@ -141,6 +141,11 @@ EXTRA_REGIONS = {
     "wa": ("WA", "West Africa"),
     "vn": ("SE", "Vietnam / SE Asia"),
     "co": ("CO", "Colombia / N. S. America"),
+    "ca": ("CA", "Central America"),
+    "ec": ("CO", "Ecuador (N. S. America map)"),   # CO covers Ecuador too
+    "in": ("IN", "India"),
+    "th": ("SE", "Thailand (SE Asia map)"),         # SE covers Thailand too
+    "au": ("AU", "Australia"),
 }
 
 

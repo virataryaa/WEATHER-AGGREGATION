@@ -70,6 +70,65 @@ REGIONS = {
             "Cauca":     {"lat": (1.5,  3.5), "lon": (-77.5, -75.5)},
         },
     },
+    "ca": {
+        "name": "Central America",
+        "bbox": {"lat_min": 7.5, "lat_max": 18.5, "lon_min": -92.0, "lon_max": -77.0},
+        "figsize": (4, 4),
+        "zones": {
+            "Honduras - Coban":   {"lat": (14.5, 15.5), "lon": (-88.5, -87.5)},
+            "Guatemala - Antigua":{"lat": (14.2, 14.8), "lon": (-90.9, -90.3)},
+            "Guatemala - Huehue": {"lat": (15.2, 15.8), "lon": (-91.8, -91.2)},
+            "Nicaragua - Jinotega":{"lat":(13.0, 14.0), "lon": (-86.2, -85.2)},
+            "El Salvador":        {"lat": (13.5, 14.5), "lon": (-90.0, -88.5)},
+        },
+    },
+    "ec": {
+        "name": "Ecuador",
+        "bbox": {"lat_min": -5.5, "lat_max": 2.0, "lon_min": -81.5, "lon_max": -74.5},
+        "figsize": (3, 4),
+        "zones": {
+            "Guayas":      {"lat": (-3.0, -1.5), "lon": (-80.0, -79.0)},
+            "Los Rios":    {"lat": (-2.0, -0.5), "lon": (-79.8, -79.0)},
+            "Esmeraldas":  {"lat": (0.0,   1.0), "lon": (-79.8, -78.8)},
+            "Pichincha":   {"lat": (-0.5,  0.5), "lon": (-78.8, -78.0)},
+            "Manabi":      {"lat": (-1.5,  0.5), "lon": (-80.8, -79.8)},
+        },
+    },
+    "in": {
+        "name": "India",
+        "bbox": {"lat_min": 8.0, "lat_max": 28.0, "lon_min": 72.0, "lon_max": 88.0},
+        "figsize": (4, 5),
+        "zones": {
+            "Uttar Pradesh":  {"lat": (25.5, 27.5), "lon": (77.0, 80.0)},
+            "Maharashtra":    {"lat": (17.0, 19.5), "lon": (74.0, 76.5)},
+            "Karnataka":      {"lat": (13.5, 15.5), "lon": (74.5, 77.0)},
+            "Tamil Nadu":     {"lat": (10.0, 12.5), "lon": (77.0, 79.5)},
+            "Andhra Pradesh": {"lat": (14.0, 16.5), "lon": (78.5, 80.5)},
+        },
+    },
+    "th": {
+        "name": "Thailand",
+        "bbox": {"lat_min": 5.0, "lat_max": 21.0, "lon_min": 97.0, "lon_max": 106.0},
+        "figsize": (3, 5),
+        "zones": {
+            "Kanchanaburi":  {"lat": (14.0, 15.5), "lon": (98.5, 99.5)},
+            "Korat Plateau": {"lat": (14.5, 16.5), "lon": (101.0, 103.0)},
+            "Chiang Mai":    {"lat": (18.0, 19.0), "lon": (98.5, 99.5)},
+            "Chiang Rai":    {"lat": (19.5, 20.5), "lon": (99.5, 100.5)},
+            "Suphan Buri":   {"lat": (14.5, 15.5), "lon": (99.8, 100.2)},
+        },
+    },
+    "au": {
+        "name": "Australia",
+        "bbox": {"lat_min": -38.0, "lat_max": -10.0, "lon_min": 138.0, "lon_max": 155.0},
+        "figsize": (4, 5),
+        "zones": {
+            "Cairns":      {"lat": (-17.5, -16.5), "lon": (145.5, 146.5)},
+            "Mackay":      {"lat": (-21.5, -20.5), "lon": (148.5, 149.5)},
+            "Bundaberg":   {"lat": (-25.5, -24.5), "lon": (151.5, 152.5)},
+            "Grafton NSW": {"lat": (-30.0, -28.5), "lon": (152.5, 153.5)},
+        },
+    },
 }
 
 MAP_CONFIGS = {

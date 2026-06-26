@@ -121,7 +121,6 @@ def region_tab(rk):
         (latest(f"opencharts_{oc_prefix}anom_2t_w4_*.png"), "Week 4"),
     ], n_cols=4)
 
-    # Brazil-only sections
     if rk == "br":
         sec("Frost Alert — CPTEC Geadas")
         show_grid([
@@ -160,18 +159,12 @@ def region_tab(rk):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-tab_br, tab_co, tab_vn, tab_ic = st.tabs([
-    "Brazil", "Colombia", "Vietnam", "Ivory Coast"
+tabs = st.tabs([
+    "Brazil", "Colombia", "Vietnam", "Central America",
+    "West Africa", "Ecuador", "India", "Thailand", "Australia"
 ])
+TAB_KEYS = ["br", "co", "vn", "ca", "wa", "ec", "in", "th", "au"]
 
-with tab_br:
-    region_tab("br")
-
-with tab_co:
-    region_tab("co")
-
-with tab_vn:
-    region_tab("vn")
-
-with tab_ic:
-    region_tab("wa")
+for tab, rk in zip(tabs, TAB_KEYS):
+    with tab:
+        region_tab(rk)
