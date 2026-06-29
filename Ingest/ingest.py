@@ -157,16 +157,29 @@ MAP_CONFIGS = {
 
 
 def download():
+    import time as _time
     print(f"[{datetime.now():%H:%M:%S}] Downloading ECMWF forecast...")
     client = Client("ecmwf", beta=False)
-    client.retrieve(
-        date=0, time=0,
-        step=[12, 24],
-        stream="oper", type="fc", levtype="sfc",
-        param=["msl", "tp", "2t"],
-        target=GRIB_FILE,
-    )
-    print(f"[{datetime.now():%H:%M:%S}] Download complete.")
+    # Try today's 00Z run; if not yet published fall back to yesterday
+    for attempt, date_offset in enumerate([0, -1]):
+        try:
+            client.retrieve(
+                date=date_offset, time=0,
+                step=[12, 24],
+                stream="oper", type="fc", levtype="sfc",
+                param=["msl", "tp", "2t"],
+                target=GRIB_FILE,
+            )
+            if date_offset < 0:
+                print(f"[{datetime.now():%H:%M:%S}] Today not ready — using yesterday's run.")
+            print(f"[{datetime.now():%H:%M:%S}] Download complete.")
+            return
+        except Exception as e:
+            if "404" in str(e) and date_offset == 0:
+                print(f"[{datetime.now():%H:%M:%S}] Today's 00Z not yet published, retrying with yesterday...")
+                _time.sleep(5)
+                continue
+            raise
 
 
 def fix_lon(ds):

@@ -1,0 +1,85 @@
+ 
+======================================== 
+ MORNING RUN  |  29/06/2026   9:10:02.68 
+======================================== 
+[1/5] ECMWF Open Data... 
+To ensure the stability of our systems and to preserve resources for our operational activities (network, compute, etc.), access to the open-data portal is limited to 500 simultaneous connections. This limit helps us guarantee reliable service for our operational users, especially during periods of high demand. For added reliability, the open-data is replicated across AWS, Azure, and Google Cloud. If you experience difficulties accessing the portal directly, you can also retrieve the data from these cloud platforms.
+
+==================================================
+  Weather Ingest  |  2026-06-29
+==================================================
+[09:10:48] Downloading ECMWF forecast...
+Traceback (most recent call last):
+  File "C:\Users\virat.arya\ETG\SoftsDatabase - Documents\Database\Hardmine\Non Fundamental\Weather\AGGREGATION OF WEATHER\Ingest\ingest.py", line 407, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\virat.arya\ETG\SoftsDatabase - Documents\Database\Hardmine\Non Fundamental\Weather\AGGREGATION OF WEATHER\Ingest\ingest.py", line 354, in main
+    download()
+    ~~~~~~~~^^
+  File "C:\Users\virat.arya\ETG\SoftsDatabase - Documents\Database\Hardmine\Non Fundamental\Weather\AGGREGATION OF WEATHER\Ingest\ingest.py", line 162, in download
+    client.retrieve(
+    ~~~~~~~~~~~~~~~^
+        date=0, time=0,
+        ^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        target=GRIB_FILE,
+        ^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\virat.arya\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\ecmwf\opendata\client.py", line 152, in retrieve
+    return self._download(request, target=target, use_index=True, **kwargs)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\virat.arya\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\ecmwf\opendata\client.py", line 136, in _download
+    result = self._get_urls(request, target=target, use_index=use_index, **kwargs)
+  File "C:\Users\virat.arya\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\ecmwf\opendata\client.py", line 248, in _get_urls
+    data_urls = self.get_parts(data_urls, for_index)
+  File "C:\Users\virat.arya\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\ecmwf\opendata\client.py", line 269, in get_parts
+    r.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\virat.arya\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\requests\models.py", line 1026, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: https://data.ecmwf.int/forecasts/20260629/00z/ifs/0p25/oper/20260629000000-12h-oper-fc.index
+[ERROR] ECMWF failed 
+[Notify] Sending email... 
+Weather Aggregation — ERROR
+Run time  : 2026-06-29 09:10
+Status    : ERROR — check run_morning.log
+GitHub    : No changes — push skipped
+Dashboard : https://weather-aggregation-ggz3zjxavouuk2fbkg9wjh.streamlit.app/
+
+============================================================
+INGEST SUMMARY
+============================================================
+  ECMWF Open Data                27 maps   2026-06-26 12:17   OK   (9 regions x 3 params)
+  ECMWF OpenCharts               53 maps   2026-06-26 12:10   OK   (anomaly W1-4 + seasonal)
+  Maxar WeatherDesk             113 maps   2026-06-26 12:18   OK   (OP + EN, 9 regions)
+  Static (CPTEC/CPC/GFS)         10 maps   2026-06-26 12:20   OK   (frost + observed + GFS)
+  ERA5 Reanalysis                 1 maps   2026-06-26 12:05   OK   (30-day cumulative)
+
+  Total maps on disk            204 files
+  Repo / maps size              29.3 MB
+============================================================
+BRAZIL — MINAS GERAIS (latest ECMWF)
+============================================================
+  Date    : 1970-01-01
+  Precip  : 0.34 mm
+  T min   : 19.1 °C
+  T max   : 20.3 °C
+  MSLP    : 1022.5 hPa
+============================================================
+REGIONS
+============================================================
+  Brazil                OK   last: 2026-06-26 12:17
+  Colombia              OK   last: 2026-06-26 12:17
+  Vietnam               OK   last: 2026-06-26 12:17
+  Central America       OK   last: 2026-06-26 12:17
+  West Africa           OK   last: 2026-06-26 12:17
+  Ecuador               OK   last: 2026-06-26 12:17
+  India                 OK   last: 2026-06-26 12:17
+  Thailand              OK   last: 2026-06-26 12:17
+  Australia             OK   last: 2026-06-26 12:17
+============================================================
+Log : C:\Users\virat.arya\ETG\SoftsDatabase - Documents\Database\Hardmine\Non Fundamental\Weather\AGGREGATION OF WEATHER\Automator\run_morning.log
+
+  Email sent -> virat.arya@etgworld.com
+Run finished: 29/06/2026  9:10:52.92 

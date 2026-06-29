@@ -111,7 +111,12 @@ def brazil_stats():
         if not pq.exists():
             return "  weather_mg.parquet not found"
         df = pd.read_parquet(pq)
-        df.index = pd.to_datetime(df.index)
+        idx = df.index
+        # Handle date objects, strings, or integer day-offsets
+        if hasattr(idx[0], 'year'):
+            df.index = pd.DatetimeIndex([pd.Timestamp(d) for d in idx])
+        else:
+            df.index = pd.to_datetime(idx)
         df = df.sort_index()
         row = df.iloc[-1]
         dt  = df.index[-1]
