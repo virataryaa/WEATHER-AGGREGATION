@@ -158,9 +158,7 @@ def region_tab(rk):
             (latest("static_cpc_7d_obs_*.png"),    "CPC 7-Day Observed"),
             (latest("static_cpc_7d_anom_*.png"),   "CPC 7-Day Anomaly"),
             (latest("static_cpc_30d_pnorm_*.png"), "CPC 30-Day % Normal"),
-            (latest("static_gfs_w1_*.png"),        "GFS Week 1"),
-            (latest("static_gfs_w2_*.png"),        "GFS Week 2"),
-        ], n_cols=5)
+        ], n_cols=3)
 
     if rk == "br":
         sec("Seasonal / ENSO — ECMWF SEAS5")
