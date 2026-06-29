@@ -107,20 +107,24 @@ def region_tab(rk):
         (latest(f"maxar_en_ecm_{en_slug}precip_mm_day1-5_*.png"),   "ECM Day 1-5"),
         (latest(f"maxar_en_ecm_{en_slug}precip_mm_day6-10_*.png"),  "ECM Day 6-10"),
         (latest(f"maxar_en_ecm_{en_slug}precip_mm_day11-15_*.png"), "ECM Day 11-15"),
+    ], n_cols=3)
+    show_grid([
         (latest(f"maxar_en_gfs_{en_slug}precip_mm_day1-5_*.png"),   "GFS Day 1-5"),
         (latest(f"maxar_en_gfs_{en_slug}precip_mm_day6-10_*.png"),  "GFS Day 6-10"),
         (latest(f"maxar_en_gfs_{en_slug}precip_mm_day11-15_*.png"), "GFS Day 11-15"),
-    ], n_cols=6)
+    ], n_cols=3)
 
     sec("Ensemble % of Normal — ECM vs GFS")
     show_grid([
         (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day1-5_*.png"),   "ECM Day 1-5"),
         (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day6-10_*.png"),  "ECM Day 6-10"),
         (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day11-15_*.png"), "ECM Day 11-15"),
+    ], n_cols=3)
+    show_grid([
         (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day1-5_*.png"),   "GFS Day 1-5"),
         (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day6-10_*.png"),  "GFS Day 6-10"),
         (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day11-15_*.png"), "GFS Day 11-15"),
-    ], n_cols=6)
+    ], n_cols=3)
 
     # OpenCharts anomaly — Brazil uses no prefix, others use rk_ prefix
     oc_prefix = "" if rk == "br" else f"{rk}_"
