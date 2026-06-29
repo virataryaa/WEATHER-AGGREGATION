@@ -99,41 +99,6 @@ def region_tab(rk):
         (latest(ecmwf_pat.format(p="tmax")),   "Max Temp"),
     ], n_cols=3)
 
-    # Maxar OP — Brazil uses no prefix, others use rk_ prefix
-    mx_prefix = "" if rk == "br" else f"{rk}_"
-
-    sec("Maxar OP — 7-Day Summary")
-    show_grid([
-        (latest(f"maxar_{mx_prefix}precip_7d_*.png"),  "7-Day Precip"),
-        (latest(f"maxar_{mx_prefix}precip_norm_*.png"),"% of Normal"),
-        (latest(f"maxar_{mx_prefix}temp_850_*.png"),   "850mb Temp"),
-        (latest(f"maxar_{mx_prefix}temp_2m_*.png"),    "2m Temp"),
-        (latest(f"maxar_{mx_prefix}dewpoint_*.png"),   "Dewpoint"),
-    ], n_cols=5)
-
-    # Maxar EN — Brazil has no region slug, others have rk_ in the middle
-    en_slug = "" if rk == "br" else f"{rk}_"
-
-    sec("Ensemble Precip (mm) — ECM vs GFS")
-    show_grid([
-        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day1-5_*.png"),   "ECM Day 1-5"),
-        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day6-10_*.png"),  "ECM Day 6-10"),
-        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day11-15_*.png"), "ECM Day 11-15"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day1-5_*.png"),   "GFS Day 1-5"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day6-10_*.png"),  "GFS Day 6-10"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day11-15_*.png"), "GFS Day 11-15"),
-    ], n_cols=6)
-
-    sec("Ensemble % of Normal — ECM vs GFS")
-    show_grid([
-        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day1-5_*.png"),   "ECM Day 1-5"),
-        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day6-10_*.png"),  "ECM Day 6-10"),
-        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day11-15_*.png"), "ECM Day 11-15"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day1-5_*.png"),   "GFS Day 1-5"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day6-10_*.png"),  "GFS Day 6-10"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day11-15_*.png"), "GFS Day 11-15"),
-    ], n_cols=6)
-
     # OpenCharts anomaly — Brazil uses no prefix, others use rk_ prefix
     oc_prefix = "" if rk == "br" else f"{rk}_"
 
