@@ -53,7 +53,7 @@ echo [Git] Committing and pushing...
 echo [Git] Committing and pushing... >> "%LOG%"
 cd /d "%BASE%"
 git add Database\weather_mg.parquet
-git add "Database\maps\"
+git add -A Database/maps
 git diff --cached --quiet
 if %ERRORLEVEL% NEQ 0 (
     git commit -m "Morning run %DATE% %TIME%" >> "%LOG%" 2>&1
