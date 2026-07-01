@@ -18,11 +18,32 @@ from datetime import date
 from PIL import Image
 
 
+def _crop_copyright(img: Image.Image) -> Image.Image:
+    """Remove the bottom copyright/logo strip by finding the white gap above it."""
+    import numpy as np
+    arr = np.array(img)
+    h = arr.shape[0]
+    # A row is "white" if its average pixel value > 245
+    row_is_white = arr.mean(axis=(1, 2)) > 245
+    # Scan from bottom upward: skip the copyright content, then find white gap above it
+    crop_y = h
+    found_content = False
+    for i in range(h - 1, h // 2, -1):
+        if not row_is_white[i]:
+            found_content = True
+        elif found_content:
+            # First white row above the bottom content block = top of the gap
+            crop_y = i
+            break
+    return img.crop((0, 0, img.width, crop_y))
+
+
 def save_compressed(data: bytes, out_path: str, max_width: int = 900):
     img = Image.open(io.BytesIO(data)).convert("RGB")
     if img.width > max_width:
         ratio = max_width / img.width
         img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
+    img = _crop_copyright(img)
     img.save(out_path, "PNG", optimize=True, compress_level=7)
 
 BASE     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
