@@ -92,12 +92,12 @@ def region_tab(rk):
     # ECMWF maps — Brazil files start with date (20??-??-??), others with rk_
     ecmwf_pat = "20??-??-??_{p}.png" if rk == "br" else f"{rk}_20??-??-??_{{p}}.png"
 
-    sec("Short-term Forecast — ECMWF Open Data")
-    show_grid([
-        (latest(ecmwf_pat.format(p="precip")), "Precip"),
-        (latest(ecmwf_pat.format(p="tmin")),   "Min Temp"),
-        (latest(ecmwf_pat.format(p="tmax")),   "Max Temp"),
-    ], n_cols=3)
+    with st.expander("Short-term Forecast — ECMWF Open Data", expanded=False):
+        show_grid([
+            (latest(ecmwf_pat.format(p="precip")), "Precip"),
+            (latest(ecmwf_pat.format(p="tmin")),   "Min Temp"),
+            (latest(ecmwf_pat.format(p="tmax")),   "Max Temp"),
+        ], n_cols=3)
 
     # Maxar EN — Brazil has no region slug, others have rk_ in the middle
     en_slug = "" if rk == "br" else f"{rk}_"
