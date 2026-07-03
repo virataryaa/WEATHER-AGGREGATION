@@ -129,10 +129,6 @@ def region_tab(rk):
         (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day6-10_*.png"),  "GFS Day 6-10"),
         (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day11-15_*.png"), "GFS Day 11-15"),
     ], n_cols=3)
-    show_grid([
-        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day1-15_*.png"), "ECM Day 1-15"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day1-15_*.png"), "GFS Day 1-15"),
-    ], n_cols=2)
 
     # OpenCharts anomaly — Brazil uses no prefix, others use rk_ prefix
     oc_prefix = "" if rk == "br" else f"{rk}_"
