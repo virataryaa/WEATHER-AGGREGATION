@@ -23,19 +23,40 @@ def _crop_copyright(img: Image.Image) -> Image.Image:
     import numpy as np
     arr = np.array(img)
     h = arr.shape[0]
-    # A row is "white" if its average pixel value > 245
     row_is_white = arr.mean(axis=(1, 2)) > 245
-    # Scan from bottom upward: skip the copyright content, then find white gap above it
     crop_y = h
     found_content = False
     for i in range(h - 1, h // 2, -1):
         if not row_is_white[i]:
             found_content = True
         elif found_content:
-            # First white row above the bottom content block = top of the gap
             crop_y = i
             break
     return img.crop((0, 0, img.width, crop_y))
+
+
+def _crop_top(img: Image.Image) -> Image.Image:
+    """Remove the top title/subtitle strip by finding where the map content starts."""
+    import numpy as np
+    arr = np.array(img)
+    h = arr.shape[0]
+    row_is_white = arr.mean(axis=(1, 2)) > 245
+    # Track the last transition from white→content in the top 35% (= map start)
+    last_white_end = 0
+    in_white = row_is_white[0]
+    white_start = 0 if in_white else None
+    for i in range(int(h * 0.35)):
+        if row_is_white[i]:
+            if not in_white:
+                white_start = i
+                in_white = True
+        else:
+            if in_white and white_start is not None:
+                if i - white_start >= 3:
+                    last_white_end = i
+                in_white = False
+                white_start = None
+    return img.crop((0, last_white_end, img.width, img.height))
 
 
 def save_compressed(data: bytes, out_path: str, max_width: int = 900):
@@ -43,6 +64,7 @@ def save_compressed(data: bytes, out_path: str, max_width: int = 900):
     if img.width > max_width:
         ratio = max_width / img.width
         img = img.resize((max_width, int(img.height * ratio)), Image.LANCZOS)
+    img = _crop_top(img)
     img = _crop_copyright(img)
     img.save(out_path, "PNG", optimize=True, compress_level=7)
 

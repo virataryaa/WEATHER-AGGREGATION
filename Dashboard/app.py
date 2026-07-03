@@ -113,6 +113,10 @@ def region_tab(rk):
         (latest(f"maxar_en_gfs_{en_slug}precip_mm_day6-10_*.png"),  "GFS Day 6-10"),
         (latest(f"maxar_en_gfs_{en_slug}precip_mm_day11-15_*.png"), "GFS Day 11-15"),
     ], n_cols=3)
+    show_grid([
+        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day1-15_*.png"), "ECM Day 1-15"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day1-15_*.png"), "GFS Day 1-15"),
+    ], n_cols=2)
 
     sec("Ensemble % of Normal — ECM vs GFS")
     show_grid([
@@ -125,6 +129,10 @@ def region_tab(rk):
         (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day6-10_*.png"),  "GFS Day 6-10"),
         (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day11-15_*.png"), "GFS Day 11-15"),
     ], n_cols=3)
+    show_grid([
+        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day1-15_*.png"), "ECM Day 1-15"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day1-15_*.png"), "GFS Day 1-15"),
+    ], n_cols=2)
 
     # OpenCharts anomaly — Brazil uses no prefix, others use rk_ prefix
     oc_prefix = "" if rk == "br" else f"{rk}_"
@@ -133,17 +141,21 @@ def region_tab(rk):
     show_grid([
         (latest(f"opencharts_{oc_prefix}anom_tp_w1_*.png"), "Week 1"),
         (latest(f"opencharts_{oc_prefix}anom_tp_w2_*.png"), "Week 2"),
+    ], n_cols=2)
+    show_grid([
         (latest(f"opencharts_{oc_prefix}anom_tp_w3_*.png"), "Week 3"),
         (latest(f"opencharts_{oc_prefix}anom_tp_w4_*.png"), "Week 4"),
-    ], n_cols=4)
+    ], n_cols=2)
 
     sec("Weekly Temp Anomaly — ECMWF Extended")
     show_grid([
         (latest(f"opencharts_{oc_prefix}anom_2t_w1_*.png"), "Week 1"),
         (latest(f"opencharts_{oc_prefix}anom_2t_w2_*.png"), "Week 2"),
+    ], n_cols=2)
+    show_grid([
         (latest(f"opencharts_{oc_prefix}anom_2t_w3_*.png"), "Week 3"),
         (latest(f"opencharts_{oc_prefix}anom_2t_w4_*.png"), "Week 4"),
-    ], n_cols=4)
+    ], n_cols=2)
 
     if rk == "br":
         sec("Frost Alert — CPTEC Geadas")
@@ -153,22 +165,29 @@ def region_tab(rk):
             (latest("static_geada_d3_*.png"), "Day 3"),
         ], n_cols=3)
 
-        sec("Observed — CPC / NOAA + GFS")
+        sec("Observed — CPC / NOAA")
         show_grid([
-            (latest("static_cpc_7d_obs_*.png"),    "CPC 7-Day Observed"),
-            (latest("static_cpc_7d_anom_*.png"),   "CPC 7-Day Anomaly"),
-            (latest("static_cpc_30d_pnorm_*.png"), "CPC 30-Day % Normal"),
+            (latest("static_cpc_7d_obs_*.png"),   "CPC 7-Day Observed"),
+            (latest("static_cpc_7d_anom_*.png"),  "CPC 7-Day Anomaly"),
+            (latest("static_cpc_7d_pnorm_*.png"), "CPC 7-Day % Normal"),
         ], n_cols=3)
+        show_grid([
+            (latest("static_cpc_30d_pnorm_*.png"), "CPC 30-Day % Normal"),
+        ], n_cols=1)
 
     if rk == "br":
         sec("Seasonal / ENSO — ECMWF SEAS5")
         show_grid([
             (latest("opencharts_seas_m1_*.png"), "Month 1"),
             (latest("opencharts_seas_m2_*.png"), "Month 2"),
+        ], n_cols=2)
+        show_grid([
             (latest("opencharts_seas_m3_*.png"), "Month 3"),
             (latest("opencharts_seas_m4_*.png"), "Month 4"),
-            (latest("opencharts_enso_*.png"),    "Nino 3.4 Plumes"),
-        ], n_cols=5)
+        ], n_cols=2)
+        show_grid([
+            (latest("opencharts_enso_*.png"), "Nino 3.4 Plumes"),
+        ], n_cols=1)
 
         sec("ERA5 Reanalysis — 30-Day Cumulative Precip")
         left, _ = st.columns([1, 2])

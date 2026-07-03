@@ -47,6 +47,7 @@ STATIC_SOURCES = [
     # CPC observed (gauge-based)
     {"key": "cpc_7d_obs",    "url": f"{CPC_BASE}/cpcuni_gauge/cpcuni_gauge_7day_sam_obs.gif"},
     {"key": "cpc_7d_anom",   "url": f"{CPC_BASE}/cpcuni_gauge/cpcuni_gauge_7day_sam_anom.gif"},
+    {"key": "cpc_7d_pnorm",  "url": f"{CPC_BASE}/cpcuni_gauge/cpcuni_gauge_7day_sam_pnorm.gif"},
     {"key": "cpc_30d_pnorm", "url": f"{CPC_BASE}/cpcuni_gauge/cpcuni_gauge_30day_sam_pnorm.gif"},
     # GFS model
     {"key": "gfs_w1",        "url": f"{CPC_BASE}/cpci/data/00/gfs.t00z.totp.week1.samerica.gif"},

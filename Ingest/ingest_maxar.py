@@ -104,6 +104,22 @@ def find_window_frame(by_path, init_dt, day_end):
     return None
 
 
+def find_combined_frame(by_path, init_dt):
+    """Find the 1-15 day cumulative frame (dr-0015_) at day 15."""
+    for path, info in by_path.items():
+        if not info.get("available"):
+            continue
+        if "dr-0015_" not in os.path.basename(path):
+            continue
+        vt = info.get("validTime", "")
+        if not vt:
+            continue
+        days_out = (_parse_dt(vt) - init_dt).total_seconds() / 86400
+        if abs(days_out - 15) < 0.5:
+            return path
+    return None
+
+
 def fetch_en(run_date):
     for model in EN_MODELS:
         for code, var_label in EN_VARIABLES.items():
@@ -133,6 +149,18 @@ def fetch_en(run_date):
                     print(f"  [en/{model}/{code}/{window_label}] -> {os.path.basename(out)}  ({len(content):,} B)")
                 except Exception as e:
                     print(f"  [en/{model}/{code}/{window_label}] download error: {e}")
+            # 1-15 combined
+            path15 = find_combined_frame(by_path, init_dt)
+            if path15:
+                key = f"en_{model}_{var_label}_day1-15"
+                out = os.path.join(MAPS_DIR, f"maxar_{key}_{run_date}.png")
+                try:
+                    content = download_image(path15)
+                    with open(out, "wb") as f:
+                        f.write(content)
+                    print(f"  [en/{model}/{code}/day1-15] -> {os.path.basename(out)}  ({len(content):,} B)")
+                except Exception as e:
+                    print(f"  [en/{model}/{code}/day1-15] download error: {e}")
 
 
 # ── Regional runs ────────────────────────────────────────────────────────────
@@ -205,6 +233,18 @@ def fetch_en_region(region_key, maxar_region, run_date):
                     print(f"  [{region_key}/en/{model}/{code}/{window_label}] -> {os.path.basename(out)}")
                 except Exception as e:
                     print(f"  [{region_key}/en/{model}/{code}/{window_label}] error: {e}")
+            # 1-15 combined
+            path15 = find_combined_frame(by_path, init_dt)
+            if path15:
+                out = os.path.join(MAPS_DIR,
+                    f"maxar_en_{model}_{region_key}_{var_label}_day1-15_{run_date}.png")
+                try:
+                    content = download_image(path15)
+                    with open(out, "wb") as f:
+                        f.write(content)
+                    print(f"  [{region_key}/en/{model}/{code}/day1-15] -> {os.path.basename(out)}")
+                except Exception as e:
+                    print(f"  [{region_key}/en/{model}/{code}/day1-15] error: {e}")
 
 
 # ── Main ─────────────────────────────────────────────────────────────────────
