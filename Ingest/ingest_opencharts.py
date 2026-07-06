@@ -194,10 +194,10 @@ REGION_PROJECTIONS = [
 
 # Regions that have ECMWF SEAS5 seasonal products
 SEASONAL_REGION_AREAS = {
-    "wa": ("AFRC", "West Africa"),
-    "in": ("INDI", "India"),
-    "vn": ("SEAS", "Vietnam / SE Asia"),
-    "th": ("SEAS", "Thailand"),
+    "wa": ("AFRI", "West Africa"),
+    "in": ("ASIA", "India"),
+    "vn": ("TROP", "Vietnam / SE Asia"),
+    "th": ("TROP", "Thailand"),
     "au": ("AUST", "Australia"),
 }
 
