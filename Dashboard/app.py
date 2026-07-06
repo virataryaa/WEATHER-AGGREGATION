@@ -175,26 +175,40 @@ def region_tab(rk):
             (latest("static_cpc_30d_pnorm_*.png"), "CPC 30-Day % Normal"),
         ], n_cols=1)
 
-    if rk == "br":
+    # GEFS precip anomaly — Brazil, West Africa, India
+    if rk in ("br", "wa", "in"):
+        gefs_d7  = latest("static_gefs_anom_d7_*.png")  if rk == "br" else latest(f"static_{rk}_gefs_anom_d7_*.png")
+        gefs_d14 = latest("static_gefs_anom_d14_*.png") if rk == "br" else latest(f"static_{rk}_gefs_anom_d14_*.png")
+        sec("GEFS Precip Anomaly — TropicalTidbits")
+        show_grid([
+            (gefs_d7,  "Days 1-7"),
+            (gefs_d14, "Days 8-14"),
+        ], n_cols=2)
+
+    # Seasonal SEAS5 — Brazil + WA, IN, VN, TH, AU
+    if rk in ("br", "wa", "in", "vn", "th", "au"):
+        seas_p = "" if rk == "br" else f"{rk}_"
         sec("Seasonal / ENSO — ECMWF SEAS5")
         show_grid([
-            (latest("opencharts_seas_m1_*.png"), "Month 1"),
-            (latest("opencharts_seas_m2_*.png"), "Month 2"),
+            (latest(f"opencharts_{seas_p}seas_m1_*.png"), "Month 1"),
+            (latest(f"opencharts_{seas_p}seas_m2_*.png"), "Month 2"),
         ], n_cols=2)
         show_grid([
-            (latest("opencharts_seas_m3_*.png"), "Month 3"),
-            (latest("opencharts_seas_m4_*.png"), "Month 4"),
+            (latest(f"opencharts_{seas_p}seas_m3_*.png"), "Month 3"),
+            (latest(f"opencharts_{seas_p}seas_m4_*.png"), "Month 4"),
         ], n_cols=2)
         show_grid([
             (latest("opencharts_enso_*.png"), "Nino 3.4 Plumes"),
         ], n_cols=1)
 
+    # ERA5 30-day cumulative — Brazil and West Africa
+    if rk in ("br", "wa"):
+        era5_file = latest("era5_precip30d_[0-9]*.png") if rk == "br" else latest("era5_wa_precip30d_*.png")
         sec("ERA5 Reanalysis — 30-Day Cumulative Precip")
         left, _ = st.columns([1, 2])
         with left:
-            f = latest("era5_precip30d_*.png")
-            if f:
-                st.image(f, use_container_width=True)
+            if era5_file:
+                st.image(era5_file, use_container_width=True)
             else:
                 st.caption("Run Ingest/ingest_era5.py")
 

@@ -192,6 +192,36 @@ REGION_PROJECTIONS = [
     ("au", "opencharts_australasia",    "Australia"),
 ]
 
+# Regions that have ECMWF SEAS5 seasonal products
+SEASONAL_REGION_AREAS = {
+    "wa": ("AFRC", "West Africa"),
+    "in": ("INDI", "India"),
+    "vn": ("SEAS", "Vietnam / SE Asia"),
+    "th": ("SEAS", "Thailand"),
+    "au": ("AUST", "Australia"),
+}
+
+
+def fetch_seasonal_rain_region(region_key, area, label, run_date):
+    """Fetch SEAS5 seasonal rainfall for a non-Brazil region."""
+    product = "seasonal_system5_standard_rain"
+    extra   = {"area": area, "stats": "tsum"}
+    print(f"\n  [{region_key}] SEAS5 seasonal rain (area={area}) ...")
+    saved = 0
+    for i, step in enumerate(SEASONAL_STEPS, 1):
+        label_m = f"m{i}"
+        out = os.path.join(MAPS_DIR, f"opencharts_{region_key}_seas_{label_m}_{run_date}.png")
+        print(f"    step={step} ({label_m}) ...", end=" ", flush=True)
+        try:
+            data = fetch_image_bytes(product, step, extra_params=extra)
+            save_compressed(data, out)
+            print(f"ok  ({os.path.getsize(out)//1024} KB)")
+            saved += 1
+        except Exception as e:
+            print(f"skipped ({e})")
+        time.sleep(1)
+    print(f"    Saved {saved}/4")
+
 
 def fetch_weekly_anomaly_region(product, key, region_key, projection, run_date):
     print(f"\n  [{region_key}] {key.upper()} weekly anomaly ({projection}) ...")
@@ -229,11 +259,15 @@ def main():
     fetch_seasonal_rain(run_date)
     fetch_enso_plumes(run_date)
 
-    # Extra regions
+    # Extra regions — weekly anomaly
     for region_key, projection, label in REGION_PROJECTIONS:
         print(f"\n  -- {label} --")
         fetch_weekly_anomaly_region("extended-anomaly-tp", "tp", region_key, projection, run_date)
         fetch_weekly_anomaly_region("extended-anomaly-2t", "2t", region_key, projection, run_date)
+
+    # Extra regions — SEAS5 seasonal
+    for region_key, (area, label) in SEASONAL_REGION_AREAS.items():
+        fetch_seasonal_rain_region(region_key, area, label, run_date)
 
     from run_stamp import stamp
     stamp("opencharts")
