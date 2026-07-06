@@ -36,16 +36,17 @@ def _crop_copyright(img: Image.Image) -> Image.Image:
 
 
 def _crop_top(img: Image.Image) -> Image.Image:
-    """Remove the top title/subtitle strip by finding where the map content starts."""
+    """Remove only the ECMWF branding strip at the very top (≤12% of image)."""
     import numpy as np
     arr = np.array(img)
     h = arr.shape[0]
     row_is_white = arr.mean(axis=(1, 2)) > 245
-    # Track the last transition from white→content in the top 35% (= map start)
+    # Only scan the first 12% — enough to catch the title/logo strip but not
+    # deep enough to touch the Week/Month label inside the map content area.
     last_white_end = 0
     in_white = row_is_white[0]
     white_start = 0 if in_white else None
-    for i in range(int(h * 0.35)):
+    for i in range(int(h * 0.12)):
         if row_is_white[i]:
             if not in_white:
                 white_start = i
