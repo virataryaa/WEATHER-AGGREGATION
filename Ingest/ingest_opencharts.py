@@ -41,8 +41,8 @@ def _crop_top(img: Image.Image) -> Image.Image:
     arr = np.array(img)
     h = arr.shape[0]
     row_is_white = arr.mean(axis=(1, 2)) > 245
-    # Only scan the first 12% — enough to catch the title/logo strip but not
-    # deep enough to touch the Week/Month label inside the map content area.
+    # Scan the first 12% — catches the ECMWF branding strip only,
+    # leaving the Week/Month label and Base time/Valid time info intact.
     last_white_end = 0
     in_white = row_is_white[0]
     white_start = 0 if in_white else None
