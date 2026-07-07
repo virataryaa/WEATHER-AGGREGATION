@@ -16,8 +16,8 @@ echo ======================================== >> "%LOG%"
 echo  MORNING RUN  ^|  %DATE%  %TIME% >> "%LOG%"
 echo ======================================== >> "%LOG%"
 
-echo [1/5] ECMWF Open Data...
-echo [1/5] ECMWF Open Data... >> "%LOG%"
+echo [1/6] ECMWF Open Data...
+echo [1/6] ECMWF Open Data... >> "%LOG%"
 %PYTHON% "%BASE%\Ingest\ingest.py" >> "%LOG%" 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] ECMWF failed >> "%LOG%"
@@ -25,25 +25,30 @@ if %ERRORLEVEL% NEQ 0 (
     goto notify
 )
 
-echo [2/5] ECMWF OpenCharts...
-echo [2/5] ECMWF OpenCharts... >> "%LOG%"
+echo [2/6] ECMWF OpenCharts...
+echo [2/6] ECMWF OpenCharts... >> "%LOG%"
 %PYTHON% "%BASE%\Ingest\ingest_opencharts.py" >> "%LOG%" 2>&1
 if %ERRORLEVEL% NEQ 0 echo [ERROR] OpenCharts failed >> "%LOG%"
 
-echo [3/5] Maxar WeatherDesk...
-echo [3/5] Maxar WeatherDesk... >> "%LOG%"
+echo [3/6] Maxar WeatherDesk...
+echo [3/6] Maxar WeatherDesk... >> "%LOG%"
 %PYTHON% "%BASE%\Ingest\ingest_maxar.py" >> "%LOG%" 2>&1
 if %ERRORLEVEL% NEQ 0 echo [ERROR] Maxar failed >> "%LOG%"
 
-echo [4/5] Static (CPTEC / CPC / GFS)...
-echo [4/5] Static (CPTEC / CPC / GFS)... >> "%LOG%"
+echo [4/6] Static (CPTEC / CPC / GFS)...
+echo [4/6] Static (CPTEC / CPC / GFS)... >> "%LOG%"
 %PYTHON% "%BASE%\Ingest\ingest_static.py" >> "%LOG%" 2>&1
 if %ERRORLEVEL% NEQ 0 echo [ERROR] Static failed >> "%LOG%"
 
-echo [5/5] ERA5 Reanalysis...
-echo [5/5] ERA5 Reanalysis... >> "%LOG%"
+echo [5/6] ERA5 Reanalysis...
+echo [5/6] ERA5 Reanalysis... >> "%LOG%"
 %PYTHON% "%BASE%\Ingest\ingest_era5.py" >> "%LOG%" 2>&1
 if %ERRORLEVEL% NEQ 0 echo [ERROR] ERA5 failed >> "%LOG%"
+
+echo [6/6] GWI Day 1-15 %% of Normal Precip...
+echo [6/6] GWI Day 1-15 %% of Normal Precip... >> "%LOG%"
+%PYTHON% "%BASE%\Ingest\ingest_gwi_pnorm.py" >> "%LOG%" 2>&1
+if %ERRORLEVEL% NEQ 0 echo [ERROR] GWI pnorm failed >> "%LOG%"
 
 echo [Purge] Removing maps older than 2 days...
 echo [Purge] Removing maps older than 2 days... >> "%LOG%"
