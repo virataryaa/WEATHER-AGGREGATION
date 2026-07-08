@@ -104,6 +104,19 @@ def show_grid(items, n_cols):
                 st.caption("—")
 
 
+def show_centered(items):
+    """Show items centred — equal spacer columns on each side."""
+    n = len(items)
+    cols = st.columns([1] + [2] * n + [1], gap="small")
+    for i, (path, cap) in enumerate(items):
+        with cols[i + 1]:
+            st.markdown(f'<div class="map-cap">{cap}</div>', unsafe_allow_html=True)
+            if path and os.path.exists(path):
+                st.image(path, use_container_width=True)
+            else:
+                st.caption("—")
+
+
 def region_tab(rk):
     """Render a full region tab given a region key (br / wa / vn / co)."""
 
@@ -132,10 +145,10 @@ def region_tab(rk):
         (latest(f"maxar_en_gfs_{en_slug}precip_mm_day11-15_*.png"), "GFS Ensemble Day 11-15"),
     ], n_cols=3)
     sec("Ensemble Precip (mm) — Combined Day 1-15")
-    show_grid([
+    show_centered([
         (latest(f"maxar_en_ecm_{en_slug}precip_mm_day1-15_*.png"), "ECM Day 1-15"),
         (latest(f"maxar_en_gfs_{en_slug}precip_mm_day1-15_*.png"), "GFS Day 1-15"),
-    ], n_cols=4)
+    ])
 
     sec("Ensemble % of Normal — ECM vs GFS")
     show_grid([
@@ -149,10 +162,10 @@ def region_tab(rk):
         (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day11-15_*.png"), "GFS Ensemble Day 11-15"),
     ], n_cols=3)
     sec("Ensemble % of Normal — Combined Day 1-15 (GWI)")
-    show_grid([
+    show_centered([
         (latest(f"gwi_pnorm_{rk}_ecm_day1-15_*.png"), "ECM Day 1-15"),
         (latest(f"gwi_pnorm_{rk}_gfs_day1-15_*.png"), "GFS Day 1-15"),
-    ], n_cols=4)
+    ])
 
     # OpenCharts anomaly — Brazil uses no prefix, others use rk_ prefix
     oc_prefix = "" if rk == "br" else f"{rk}_"
