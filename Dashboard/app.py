@@ -18,18 +18,35 @@ st.markdown("""
         background-color: #f8f9fa !important;
         padding-top: 0 !important;
     }
-    [data-testid="block-container"] { padding: 12px 20px 0 20px !important; }
-    .sec-label {
-        font-size: 9px; font-weight: 700; color: #a0aec0;
-        letter-spacing: 0.14em; text-transform: uppercase;
-        margin: 18px 0 6px 0;
+    [data-testid="block-container"] { padding: 8px 16px 0 16px !important; }
+
+    /* Section divider bar */
+    .sec-divider {
+        display: flex; align-items: center; gap: 8px;
+        margin: 14px 0 5px 0;
     }
+    .sec-divider-line {
+        flex: 1; height: 1px; background: #d1d9e0;
+    }
+    .sec-divider-label {
+        font-size: 8.5px; font-weight: 700; color: #7a8899;
+        letter-spacing: 0.13em; text-transform: uppercase;
+        background: #e4e9ef; padding: 2px 9px;
+        border-radius: 20px; white-space: nowrap;
+    }
+
     .map-cap {
-        font-size: 10px; color: #718096; text-align: center; margin-bottom: 2px;
+        font-size: 9px; color: #8896a5; text-align: center;
+        margin-bottom: 1px; margin-top: 0;
     }
-    .stImage img { border-radius: 4px; }
+    /* Tighten Streamlit's default column element spacing */
+    [data-testid="stVerticalBlock"] { gap: 0rem !important; }
+    [data-testid="stHorizontalBlock"] { gap: 6px !important; }
+    .stImage { margin-bottom: 0 !important; }
+    .stImage img { border-radius: 3px; }
+    .stExpander { margin-bottom: 4px !important; }
     footer { display: none; }
-    h1 { font-size: 18px !important; margin-bottom: 4px !important; }
+    h1 { font-size: 17px !important; margin-bottom: 3px !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -73,7 +90,14 @@ st.markdown(
 
 
 def sec(label):
-    st.markdown(f'<div class="sec-label">{label}</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="sec-divider">'
+        f'<div class="sec-divider-line"></div>'
+        f'<span class="sec-divider-label">{label}</span>'
+        f'<div class="sec-divider-line"></div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 
 
 def show_grid(items, n_cols):
