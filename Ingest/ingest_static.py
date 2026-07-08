@@ -123,22 +123,7 @@ def main():
         except Exception as e:
             print(f"skipped ({e})")
 
-    # TropicalTidbits GEFS anomaly — extra regions
-    extra_gefs = [
-        ("wa", "afr",  "West Africa"),
-        ("in", "io",   "India / Indian Ocean"),
-    ]
-    for rk, tt_region, label in extra_gefs:
-        for key, fh in tt_charts:
-            out = os.path.join(MAPS_DIR, f"static_{rk}_{key}_{run_date}.png")
-            print(f"  [{rk}] {key} (TropicalTidbits/{tt_region} fh={fh}) ...", end=" ", flush=True)
-            try:
-                data = fetch_tt_image("gfs-ens", tt_region, "apcpna", fh)
-                with open(out, "wb") as f:
-                    f.write(data)
-                print(f"ok  ({len(data)//1024} KB)")
-            except Exception as e:
-                print(f"skipped ({e})")
+    # Note: apcpna is a North America-specific TT package — no equivalent for Africa/India
 
     from run_stamp import stamp
     stamp("static")

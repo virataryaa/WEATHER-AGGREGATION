@@ -213,10 +213,10 @@ def region_tab(rk):
             else:
                 st.caption("—")
 
-    # GEFS precip anomaly — Brazil, West Africa, India
-    if rk in ("br", "wa", "in"):
-        gefs_d7  = latest("static_gefs_anom_d7_*.png")  if rk == "br" else latest(f"static_{rk}_gefs_anom_d7_*.png")
-        gefs_d14 = latest("static_gefs_anom_d14_*.png") if rk == "br" else latest(f"static_{rk}_gefs_anom_d14_*.png")
+    # GEFS precip anomaly — Brazil only (apcpna is a North America-specific TT package)
+    if rk == "br":
+        gefs_d7  = latest("static_gefs_anom_d7_*.png")
+        gefs_d14 = latest("static_gefs_anom_d14_*.png")
         sec("GEFS Precip Anomaly — TropicalTidbits")
         show_grid([
             (gefs_d7,  "Days 1-7"),
