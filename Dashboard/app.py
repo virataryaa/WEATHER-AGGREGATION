@@ -204,9 +204,14 @@ def region_tab(rk):
             (latest("static_cpc_7d_anom_*.png"),  "CPC 7-Day Anomaly"),
             (latest("static_cpc_7d_pnorm_*.png"), "CPC 7-Day % Normal"),
         ], n_cols=3)
-        show_grid([
-            (latest("static_cpc_30d_pnorm_*.png"), "CPC 30-Day % Normal"),
-        ], n_cols=1)
+        left, _ = st.columns([1, 2])
+        with left:
+            p = latest("static_cpc_30d_pnorm_*.png")
+            st.markdown('<div class="map-cap">CPC 30-Day % Normal</div>', unsafe_allow_html=True)
+            if p:
+                st.image(p, use_container_width=True)
+            else:
+                st.caption("—")
 
     # GEFS precip anomaly — Brazil, West Africa, India
     if rk in ("br", "wa", "in"):
