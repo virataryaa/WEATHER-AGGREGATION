@@ -22,17 +22,14 @@ st.markdown("""
 
     /* Section divider bar */
     .sec-divider {
-        display: flex; align-items: center; gap: 8px;
-        margin: 14px 0 5px 0;
-    }
-    .sec-divider-line {
-        flex: 1; height: 1px; background: #d1d9e0;
+        background: #1a202c;
+        padding: 5px 12px;
+        margin: 16px 0 6px 0;
+        border-radius: 3px;
     }
     .sec-divider-label {
-        font-size: 8.5px; font-weight: 700; color: #7a8899;
-        letter-spacing: 0.13em; text-transform: uppercase;
-        background: #e4e9ef; padding: 2px 9px;
-        border-radius: 20px; white-space: nowrap;
+        font-size: 9px; font-weight: 700; color: #e2e8f0;
+        letter-spacing: 0.15em; text-transform: uppercase;
     }
 
     .map-cap {
@@ -91,11 +88,7 @@ st.markdown(
 
 def sec(label):
     st.markdown(
-        f'<div class="sec-divider">'
-        f'<div class="sec-divider-line"></div>'
-        f'<span class="sec-divider-label">{label}</span>'
-        f'<div class="sec-divider-line"></div>'
-        f'</div>',
+        f'<div class="sec-divider"><span class="sec-divider-label">{label}</span></div>',
         unsafe_allow_html=True,
     )
 
