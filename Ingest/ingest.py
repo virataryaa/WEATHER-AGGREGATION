@@ -129,6 +129,18 @@ REGIONS = {
             "Grafton NSW": {"lat": (-30.0, -28.5), "lon": (152.5, 153.5)},
         },
     },
+    "us": {
+        "name": "United States",
+        "bbox": {"lat_min": 24.0, "lat_max": 50.0, "lon_min": -125.0, "lon_max": -66.0},
+        "figsize": (6, 4),
+        "zones": {
+            "Corn Belt":   {"lat": (40.0, 44.0), "lon": (-96.0, -88.0)},
+            "Great Plains":{"lat": (36.0, 41.0), "lon": (-104.0, -97.0)},
+            "Delta":       {"lat": (32.0, 36.0), "lon": (-93.0, -89.0)},
+            "Southeast":   {"lat": (30.0, 35.0), "lon": (-86.0, -80.0)},
+            "Texas":       {"lat": (27.0, 32.0), "lon": (-102.0, -94.0)},
+        },
+    },
 }
 
 MAP_CONFIGS = {

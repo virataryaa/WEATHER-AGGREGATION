@@ -35,6 +35,7 @@ REGIONS = {
     "in": (15, "India"),
     "th": (22, "Thailand (Vietnam/Thailand map)"),
     "au": (2,  "Australia"),
+    "us": (35, "United States"),
 }
 
 # model_key -> GWI model id

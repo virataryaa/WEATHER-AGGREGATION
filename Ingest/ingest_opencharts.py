@@ -190,6 +190,7 @@ REGION_PROJECTIONS = [
     ("in", "opencharts_south_asia",     "India"),
     ("th", "opencharts_tropics",        "Thailand"),
     ("au", "opencharts_australasia",    "Australia"),
+    ("us", "opencharts_north_america",  "United States"),
 ]
 
 # Regions that have ECMWF SEAS5 seasonal products

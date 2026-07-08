@@ -213,8 +213,8 @@ def region_tab(rk):
             else:
                 st.caption("—")
 
-    # GEFS precip anomaly — Brazil only (apcpna is a North America-specific TT package)
-    if rk == "br":
+    # GEFS precip anomaly — Brazil + US share the same TropicalTidbits NA maps
+    if rk in ("br", "us"):
         gefs_d7  = latest("static_gefs_anom_d7_*.png")
         gefs_d14 = latest("static_gefs_anom_d14_*.png")
         sec("GEFS Precip Anomaly — TropicalTidbits")
@@ -259,9 +259,9 @@ def region_tab(rk):
 # ─────────────────────────────────────────────────────────────────────────────
 tabs = st.tabs([
     "Brazil", "Colombia", "Vietnam", "Central America",
-    "West Africa", "Ecuador", "India", "Thailand", "Australia"
+    "West Africa", "Ecuador", "India", "Thailand", "Australia", "United States"
 ])
-TAB_KEYS = ["br", "co", "vn", "ca", "wa", "ec", "in", "th", "au"]
+TAB_KEYS = ["br", "co", "vn", "ca", "wa", "ec", "in", "th", "au", "us"]
 
 for tab, rk in zip(tabs, TAB_KEYS):
     with tab:
