@@ -24,7 +24,7 @@ st.markdown("""
     .sec-divider {
         background: #1a202c;
         padding: 5px 12px;
-        margin: 16px 0 6px 0;
+        margin: 16px 0 14px 0;
         border-radius: 3px;
     }
     .sec-divider-label {
