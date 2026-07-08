@@ -213,8 +213,8 @@ def region_tab(rk):
             else:
                 st.caption("—")
 
-    # GEFS precip anomaly — Brazil + US share the same TropicalTidbits NA maps
-    if rk in ("br", "us"):
+    # GEFS precip anomaly — Brazil only (samer region = South America)
+    if rk == "br":
         gefs_d7  = latest("static_gefs_anom_d7_*.png")
         gefs_d14 = latest("static_gefs_anom_d14_*.png")
         sec("GEFS Precip Anomaly — TropicalTidbits")
