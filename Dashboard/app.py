@@ -235,9 +235,14 @@ def region_tab(rk):
             (latest(f"opencharts_{seas_p}seas_m3_*.png"), "Month 3"),
             (latest(f"opencharts_{seas_p}seas_m4_*.png"), "Month 4"),
         ], n_cols=2)
-        show_grid([
-            (latest("opencharts_enso_*.png"), "Nino 3.4 Plumes"),
-        ], n_cols=1)
+        left, _ = st.columns([1, 2])
+        with left:
+            p = latest("opencharts_enso_*.png")
+            st.markdown('<div class="map-cap">Nino 3.4 Plumes</div>', unsafe_allow_html=True)
+            if p:
+                st.image(p, use_container_width=True)
+            else:
+                st.caption("—")
 
     # ERA5 30-day cumulative — Brazil and West Africa
     if rk in ("br", "wa"):
