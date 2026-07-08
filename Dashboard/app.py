@@ -122,31 +122,35 @@ def region_tab(rk):
 
     sec("Ensemble Precip (mm) — ECM vs GFS")
     show_grid([
-        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day1-5_*.png"),   "ECM D1-5"),
-        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day6-10_*.png"),  "ECM D6-10"),
-        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day11-15_*.png"), "ECM D11-15"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day1-5_*.png"),   "GFS D1-5"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day6-10_*.png"),  "GFS D6-10"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day11-15_*.png"), "GFS D11-15"),
-    ], n_cols=6)
+        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day1-5_*.png"),   "ECM Ensemble Day 1-5"),
+        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day6-10_*.png"),  "ECM Ensemble Day 6-10"),
+        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day11-15_*.png"), "ECM Ensemble Day 11-15"),
+    ], n_cols=3)
     show_grid([
-        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day1-15_*.png"), "ECM D1-15"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day1-15_*.png"), "GFS D1-15"),
-    ], n_cols=4)
+        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day1-5_*.png"),   "GFS Ensemble Day 1-5"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day6-10_*.png"),  "GFS Ensemble Day 6-10"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day11-15_*.png"), "GFS Ensemble Day 11-15"),
+    ], n_cols=3)
+    show_grid([
+        (latest(f"maxar_en_ecm_{en_slug}precip_mm_day1-15_*.png"), "ECM Ensemble Day 1-15"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_mm_day1-15_*.png"), "GFS Ensemble Day 1-15"),
+    ], n_cols=2)
 
     sec("Ensemble % of Normal — ECM vs GFS")
     show_grid([
-        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day1-5_*.png"),   "ECM D1-5"),
-        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day6-10_*.png"),  "ECM D6-10"),
-        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day11-15_*.png"), "ECM D11-15"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day1-5_*.png"),   "GFS D1-5"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day6-10_*.png"),  "GFS D6-10"),
-        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day11-15_*.png"), "GFS D11-15"),
-    ], n_cols=6)
+        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day1-5_*.png"),   "ECM Ensemble Day 1-5"),
+        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day6-10_*.png"),  "ECM Ensemble Day 6-10"),
+        (latest(f"maxar_en_ecm_{en_slug}precip_pct_normal_day11-15_*.png"), "ECM Ensemble Day 11-15"),
+    ], n_cols=3)
     show_grid([
-        (latest(f"gwi_pnorm_{rk}_ecm_day1-15_*.png"), "ECM D1-15 (GWI)"),
-        (latest(f"gwi_pnorm_{rk}_gfs_day1-15_*.png"), "GFS D1-15 (GWI)"),
-    ], n_cols=4)
+        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day1-5_*.png"),   "GFS Ensemble Day 1-5"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day6-10_*.png"),  "GFS Ensemble Day 6-10"),
+        (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day11-15_*.png"), "GFS Ensemble Day 11-15"),
+    ], n_cols=3)
+    show_grid([
+        (latest(f"gwi_pnorm_{rk}_ecm_day1-15_*.png"), "ECM Ensemble Day 1-15 (GWI)"),
+        (latest(f"gwi_pnorm_{rk}_gfs_day1-15_*.png"), "GFS Ensemble Day 1-15 (GWI)"),
+    ], n_cols=2)
 
     # OpenCharts anomaly — Brazil uses no prefix, others use rk_ prefix
     oc_prefix = "" if rk == "br" else f"{rk}_"
@@ -155,17 +159,21 @@ def region_tab(rk):
     show_grid([
         (latest(f"opencharts_{oc_prefix}anom_tp_w1_*.png"), "Week 1"),
         (latest(f"opencharts_{oc_prefix}anom_tp_w2_*.png"), "Week 2"),
+    ], n_cols=2)
+    show_grid([
         (latest(f"opencharts_{oc_prefix}anom_tp_w3_*.png"), "Week 3"),
         (latest(f"opencharts_{oc_prefix}anom_tp_w4_*.png"), "Week 4"),
-    ], n_cols=4)
+    ], n_cols=2)
 
     sec("Weekly Temp Anomaly — ECMWF Extended")
     show_grid([
         (latest(f"opencharts_{oc_prefix}anom_2t_w1_*.png"), "Week 1"),
         (latest(f"opencharts_{oc_prefix}anom_2t_w2_*.png"), "Week 2"),
+    ], n_cols=2)
+    show_grid([
         (latest(f"opencharts_{oc_prefix}anom_2t_w3_*.png"), "Week 3"),
         (latest(f"opencharts_{oc_prefix}anom_2t_w4_*.png"), "Week 4"),
-    ], n_cols=4)
+    ], n_cols=2)
 
     if rk == "br":
         sec("Frost Alert — CPTEC Geadas")
@@ -173,15 +181,17 @@ def region_tab(rk):
             (latest("static_geada_d1_*.png"), "Day 1"),
             (latest("static_geada_d2_*.png"), "Day 2"),
             (latest("static_geada_d3_*.png"), "Day 3"),
-        ], n_cols=5)
+        ], n_cols=3)
 
         sec("Observed — CPC / NOAA")
         show_grid([
             (latest("static_cpc_7d_obs_*.png"),   "CPC 7-Day Observed"),
             (latest("static_cpc_7d_anom_*.png"),  "CPC 7-Day Anomaly"),
             (latest("static_cpc_7d_pnorm_*.png"), "CPC 7-Day % Normal"),
+        ], n_cols=3)
+        show_grid([
             (latest("static_cpc_30d_pnorm_*.png"), "CPC 30-Day % Normal"),
-        ], n_cols=4)
+        ], n_cols=1)
 
     # GEFS precip anomaly — Brazil, West Africa, India
     if rk in ("br", "wa", "in"):
@@ -191,7 +201,7 @@ def region_tab(rk):
         show_grid([
             (gefs_d7,  "Days 1-7"),
             (gefs_d14, "Days 8-14"),
-        ], n_cols=4)
+        ], n_cols=2)
 
     # Seasonal SEAS5 — Brazil + WA, IN, VN, TH, AU
     if rk in ("br", "wa", "in", "vn", "th", "au"):
@@ -200,18 +210,20 @@ def region_tab(rk):
         show_grid([
             (latest(f"opencharts_{seas_p}seas_m1_*.png"), "Month 1"),
             (latest(f"opencharts_{seas_p}seas_m2_*.png"), "Month 2"),
+        ], n_cols=2)
+        show_grid([
             (latest(f"opencharts_{seas_p}seas_m3_*.png"), "Month 3"),
             (latest(f"opencharts_{seas_p}seas_m4_*.png"), "Month 4"),
-        ], n_cols=4)
+        ], n_cols=2)
         show_grid([
             (latest("opencharts_enso_*.png"), "Nino 3.4 Plumes"),
-        ], n_cols=3)
+        ], n_cols=1)
 
     # ERA5 30-day cumulative — Brazil and West Africa
     if rk in ("br", "wa"):
         era5_file = latest("era5_precip30d_[0-9]*.png") if rk == "br" else latest("era5_wa_precip30d_*.png")
         sec("ERA5 Reanalysis — 30-Day Cumulative Precip")
-        left, _ = st.columns([1, 3])
+        left, _ = st.columns([1, 2])
         with left:
             if era5_file:
                 st.image(era5_file, use_container_width=True)
