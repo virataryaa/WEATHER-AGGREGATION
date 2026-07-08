@@ -131,6 +131,7 @@ def region_tab(rk):
         (latest(f"maxar_en_gfs_{en_slug}precip_mm_day6-10_*.png"),  "GFS Ensemble Day 6-10"),
         (latest(f"maxar_en_gfs_{en_slug}precip_mm_day11-15_*.png"), "GFS Ensemble Day 11-15"),
     ], n_cols=3)
+    sec("Ensemble Precip (mm) — Combined Day 1-15")
     show_grid([
         (latest(f"maxar_en_ecm_{en_slug}precip_mm_day1-15_*.png"), "ECM Day 1-15"),
         (latest(f"maxar_en_gfs_{en_slug}precip_mm_day1-15_*.png"), "GFS Day 1-15"),
@@ -147,9 +148,10 @@ def region_tab(rk):
         (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day6-10_*.png"),  "GFS Ensemble Day 6-10"),
         (latest(f"maxar_en_gfs_{en_slug}precip_pct_normal_day11-15_*.png"), "GFS Ensemble Day 11-15"),
     ], n_cols=3)
+    sec("Ensemble % of Normal — Combined Day 1-15 (GWI)")
     show_grid([
-        (latest(f"gwi_pnorm_{rk}_ecm_day1-15_*.png"), "ECM Day 1-15 (GWI)"),
-        (latest(f"gwi_pnorm_{rk}_gfs_day1-15_*.png"), "GFS Day 1-15 (GWI)"),
+        (latest(f"gwi_pnorm_{rk}_ecm_day1-15_*.png"), "ECM Day 1-15"),
+        (latest(f"gwi_pnorm_{rk}_gfs_day1-15_*.png"), "GFS Day 1-15"),
     ], n_cols=4)
 
     # OpenCharts anomaly — Brazil uses no prefix, others use rk_ prefix
