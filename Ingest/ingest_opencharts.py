@@ -211,6 +211,25 @@ def _crop_x(img: Image.Image, left_frac: float, right_frac: float) -> Image.Imag
     return img.crop((int(w * left_frac), 0, int(w * right_frac), h))
 
 
+def _crop_whitespace_top(img: Image.Image) -> Image.Image:
+    """Remove large white header blocks (title + gap) — keeps from 2nd content block onward."""
+    import numpy as np
+    arr = np.array(img)
+    row_brightness = arr.mean(axis=(1, 2))
+    in_white = row_brightness[0] > 238
+    content_blocks = 0
+    for i, brightness in enumerate(row_brightness):
+        is_white = brightness > 238
+        if in_white and not is_white:
+            content_blocks += 1
+            if content_blocks >= 2:
+                return img.crop((0, max(0, i - 4), img.width, img.height))
+            in_white = False
+        elif not in_white and is_white:
+            in_white = True
+    return img
+
+
 def fetch_seasonal_rain_region(region_key, area, label, run_date, crop_x=None):
     """Fetch SEAS5 seasonal rainfall for a non-Brazil region."""
     product = "seasonal_system5_standard_rain"
@@ -224,10 +243,10 @@ def fetch_seasonal_rain_region(region_key, area, label, run_date, crop_x=None):
         try:
             data = fetch_image_bytes(product, step, extra_params=extra)
             if crop_x:
-                # Apply SE Asia zoom before standard top/bottom crop
                 import io as _io
                 img = Image.open(_io.BytesIO(data)).convert("RGB")
                 img = _crop_x(img, crop_x[0], crop_x[1])
+                img = _crop_whitespace_top(img)
                 buf = _io.BytesIO()
                 img.save(buf, "PNG")
                 data = buf.getvalue()
