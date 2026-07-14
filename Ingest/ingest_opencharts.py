@@ -183,14 +183,13 @@ def fetch_enso_plumes(run_date):
 # Extra regions: (region_key, projection, label)
 REGION_PROJECTIONS = [
     ("wa", "opencharts_africa",         "West Africa"),
-    ("vn", "opencharts_tropics",        "Vietnam / SE Asia"),
     ("co", "opencharts_south_america",  "Colombia"),
     ("ca", "opencharts_north_america",  "Central America"),
     ("ec", "opencharts_south_america",  "Ecuador"),
-    ("in", "opencharts_south_asia",     "India"),
-    ("th", "opencharts_tropics",        "Thailand"),
+    ("in", "opencharts_southern_asia",  "India"),
     ("au", "opencharts_australasia",    "Australia"),
     ("us", "opencharts_north_america",  "United States"),
+    # opencharts_tropics (VN/TH) return 404 for extended-anomaly products
 ]
 
 # Regions that have ECMWF SEAS5 seasonal products

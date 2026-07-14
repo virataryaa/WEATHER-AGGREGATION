@@ -168,27 +168,31 @@ def region_tab(rk):
     ])
 
     # OpenCharts anomaly — Brazil uses no prefix, others use rk_ prefix
+    # Not all regions have OpenCharts extended anomaly support — only render if files exist
     oc_prefix = "" if rk == "br" else f"{rk}_"
+    tp_w1 = latest(f"opencharts_{oc_prefix}anom_tp_w1_*.png")
+    if tp_w1:
+        sec("Weekly Precip Anomaly — ECMWF Extended")
+        show_grid([
+            (tp_w1,                                              "Week 1"),
+            (latest(f"opencharts_{oc_prefix}anom_tp_w2_*.png"), "Week 2"),
+        ], n_cols=2)
+        show_grid([
+            (latest(f"opencharts_{oc_prefix}anom_tp_w3_*.png"), "Week 3"),
+            (latest(f"opencharts_{oc_prefix}anom_tp_w4_*.png"), "Week 4"),
+        ], n_cols=2)
 
-    sec("Weekly Precip Anomaly — ECMWF Extended")
-    show_grid([
-        (latest(f"opencharts_{oc_prefix}anom_tp_w1_*.png"), "Week 1"),
-        (latest(f"opencharts_{oc_prefix}anom_tp_w2_*.png"), "Week 2"),
-    ], n_cols=2)
-    show_grid([
-        (latest(f"opencharts_{oc_prefix}anom_tp_w3_*.png"), "Week 3"),
-        (latest(f"opencharts_{oc_prefix}anom_tp_w4_*.png"), "Week 4"),
-    ], n_cols=2)
-
-    sec("Weekly Temp Anomaly — ECMWF Extended")
-    show_grid([
-        (latest(f"opencharts_{oc_prefix}anom_2t_w1_*.png"), "Week 1"),
-        (latest(f"opencharts_{oc_prefix}anom_2t_w2_*.png"), "Week 2"),
-    ], n_cols=2)
-    show_grid([
-        (latest(f"opencharts_{oc_prefix}anom_2t_w3_*.png"), "Week 3"),
-        (latest(f"opencharts_{oc_prefix}anom_2t_w4_*.png"), "Week 4"),
-    ], n_cols=2)
+    t2_w1 = latest(f"opencharts_{oc_prefix}anom_2t_w1_*.png")
+    if t2_w1:
+        sec("Weekly Temp Anomaly — ECMWF Extended")
+        show_grid([
+            (t2_w1,                                              "Week 1"),
+            (latest(f"opencharts_{oc_prefix}anom_2t_w2_*.png"), "Week 2"),
+        ], n_cols=2)
+        show_grid([
+            (latest(f"opencharts_{oc_prefix}anom_2t_w3_*.png"), "Week 3"),
+            (latest(f"opencharts_{oc_prefix}anom_2t_w4_*.png"), "Week 4"),
+        ], n_cols=2)
 
     if rk == "br":
         sec("Frost Alert — CPTEC Geadas")
