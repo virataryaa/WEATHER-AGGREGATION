@@ -194,16 +194,24 @@ REGION_PROJECTIONS = [
 ]
 
 # Regions that have ECMWF SEAS5 seasonal products
+# crop_x: (left_frac, right_frac) to zoom into the region after download.
+# TROP covers full global tropics (150W-150E); SE Asia = ~60E-150E = right 30%.
 SEASONAL_REGION_AREAS = {
-    "wa": ("AFRI", "West Africa"),
-    "in": ("ASIA", "India"),
-    "vn": ("TROP", "Vietnam / SE Asia"),
-    "th": ("TROP", "Thailand"),
-    "au": ("AUST", "Australia"),
+    "wa": ("AFRI", "West Africa",       None),
+    "in": ("ASIA", "India",             None),
+    "vn": ("TROP", "Vietnam / SE Asia", (0.70, 1.0)),
+    "th": ("TROP", "Thailand",          (0.70, 1.0)),
+    "au": ("AUST", "Australia",         None),
 }
 
 
-def fetch_seasonal_rain_region(region_key, area, label, run_date):
+def _crop_x(img: Image.Image, left_frac: float, right_frac: float) -> Image.Image:
+    """Crop image horizontally to [left_frac, right_frac] of its width."""
+    w, h = img.size
+    return img.crop((int(w * left_frac), 0, int(w * right_frac), h))
+
+
+def fetch_seasonal_rain_region(region_key, area, label, run_date, crop_x=None):
     """Fetch SEAS5 seasonal rainfall for a non-Brazil region."""
     product = "seasonal_system5_standard_rain"
     extra   = {"area": area, "stats": "tsum"}
@@ -215,6 +223,14 @@ def fetch_seasonal_rain_region(region_key, area, label, run_date):
         print(f"    step={step} ({label_m}) ...", end=" ", flush=True)
         try:
             data = fetch_image_bytes(product, step, extra_params=extra)
+            if crop_x:
+                # Apply SE Asia zoom before standard top/bottom crop
+                import io as _io
+                img = Image.open(_io.BytesIO(data)).convert("RGB")
+                img = _crop_x(img, crop_x[0], crop_x[1])
+                buf = _io.BytesIO()
+                img.save(buf, "PNG")
+                data = buf.getvalue()
             save_compressed(data, out)
             print(f"ok  ({os.path.getsize(out)//1024} KB)")
             saved += 1
@@ -267,8 +283,8 @@ def main():
         fetch_weekly_anomaly_region("extended-anomaly-2t", "2t", region_key, projection, run_date)
 
     # Extra regions — SEAS5 seasonal
-    for region_key, (area, label) in SEASONAL_REGION_AREAS.items():
-        fetch_seasonal_rain_region(region_key, area, label, run_date)
+    for region_key, (area, label, crop_x) in SEASONAL_REGION_AREAS.items():
+        fetch_seasonal_rain_region(region_key, area, label, run_date, crop_x=crop_x)
 
     from run_stamp import stamp
     stamp("opencharts")
