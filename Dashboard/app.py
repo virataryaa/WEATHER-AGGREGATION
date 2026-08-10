@@ -1,11 +1,14 @@
 import os
 import glob
 import json
-from datetime import datetime
+from datetime import datetime, date
+import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 
 BASE     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAPS_DIR = os.path.join(BASE, "Database", "maps")
+SST_FILE = os.path.join(BASE, "Database", "sst_daily.parquet")
 
 st.set_page_config(page_title="Weather Aggregation", layout="wide")
 
@@ -72,6 +75,7 @@ SOURCES = [
     ("GWI",         "gwi_pnorm"),
     ("CPC / CPTEC", "static"),
     ("ERA5",        "era5"),
+    ("SST",         "sst_daily"),
 ]
 
 parts = "  &nbsp;|&nbsp;  ".join(
@@ -260,13 +264,79 @@ def region_tab(rk):
                 st.caption("Run Ingest/ingest_era5.py")
 
 
+def global_tab():
+    """Global 60N-60S daily mean sea surface temperature -- spaghetti plot by year."""
+    if not os.path.exists(SST_FILE):
+        st.info("SST database not found — run `Ingest/ingest_sst_daily.py backfill` first.")
+        return
+
+    df = pd.read_parquet(SST_FILE)
+    if df.empty:
+        st.info("SST database is empty — run `Ingest/ingest_sst_daily.py backfill` first.")
+        return
+
+    df = df.copy()
+    df["year"] = df["date"].dt.year
+    # Map every date onto a common leap-year calendar (2000) so Feb 29 lines up
+    # correctly across years and all lines share one x-axis.
+    df["x"] = pd.to_datetime("2000-" + df["date"].dt.strftime("%m-%d"), errors="coerce")
+    df = df.dropna(subset=["x"])
+
+    years = sorted(df["year"].unique())
+    current_year = date.today().year
+
+    fig = go.Figure()
+    for yr in years:
+        if yr == current_year:
+            continue
+        sub = df[df["year"] == yr].sort_values("x")
+        fig.add_trace(go.Scatter(
+            x=sub["x"], y=sub["sst_c"], mode="lines",
+            line=dict(width=1, color="rgba(196,30,58,0.22)"),
+            name=str(yr), hoverinfo="skip", showlegend=False,
+        ))
+
+    sub = df[df["year"] == current_year].sort_values("x")
+    if not sub.empty:
+        fig.add_trace(go.Scatter(
+            x=sub["x"], y=sub["sst_c"], mode="lines",
+            line=dict(width=3, color="#7a0c14"),
+            name=str(current_year),
+            hovertemplate="%{x|%b %d}: %{y:.2f}°C<extra></extra>",
+        ))
+        last = sub.iloc[-1]
+        fig.add_annotation(
+            x=last["x"], y=last["sst_c"], text=f"<b>{current_year}</b>",
+            showarrow=False, xanchor="left", xshift=8,
+            font=dict(color="#7a0c14", size=13),
+        )
+
+    fig.update_layout(
+        title="Daily Average Sea Surface Temperature — 60°N to 60°S",
+        xaxis=dict(tickformat="%b", dtick="M1", showgrid=False),
+        yaxis=dict(title="°C", showgrid=True, gridcolor="#e2e8f0", zeroline=False),
+        plot_bgcolor="#ffffff", paper_bgcolor="#ffffff",
+        height=560, margin=dict(l=40, r=90, t=60, b=30),
+        showlegend=False,
+        font=dict(color="#1a202c"),
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    st.caption(
+        f"Source: ERA5, C3S/ECMWF (Copernicus CDS)  |  "
+        f"Data to {df['date'].max().date()}  |  {years[0]}–{years[-1]} ({len(years)} years)"
+    )
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 tabs = st.tabs([
-    "Brazil", "Colombia", "Vietnam", "Central America",
+    "Global", "Brazil", "Colombia", "Vietnam", "Central America",
     "West Africa", "Ecuador", "India", "Thailand", "Australia", "United States"
 ])
-TAB_KEYS = ["br", "co", "vn", "ca", "wa", "ec", "in", "th", "au", "us"]
+TAB_KEYS = [None, "br", "co", "vn", "ca", "wa", "ec", "in", "th", "au", "us"]
 
 for tab, rk in zip(tabs, TAB_KEYS):
     with tab:
-        region_tab(rk)
+        if rk is None:
+            global_tab()
+        else:
+            region_tab(rk)

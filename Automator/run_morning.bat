@@ -45,10 +45,15 @@ echo [5/6] ERA5 Reanalysis... >> "%LOG%"
 %PYTHON% "%BASE%\Ingest\ingest_era5.py" >> "%LOG%" 2>&1
 if %ERRORLEVEL% NEQ 0 echo [ERROR] ERA5 failed >> "%LOG%"
 
-echo [6/6] GWI Day 1-15 %% of Normal Precip...
-echo [6/6] GWI Day 1-15 %% of Normal Precip... >> "%LOG%"
+echo [6/7] GWI Day 1-15 %% of Normal Precip...
+echo [6/7] GWI Day 1-15 %% of Normal Precip... >> "%LOG%"
 %PYTHON% "%BASE%\Ingest\ingest_gwi_pnorm.py" >> "%LOG%" 2>&1
 if %ERRORLEVEL% NEQ 0 echo [ERROR] GWI pnorm failed >> "%LOG%"
+
+echo [7/7] ERA5 Daily SST (60N-60S)...
+echo [7/7] ERA5 Daily SST (60N-60S)... >> "%LOG%"
+%PYTHON% "%BASE%\Ingest\ingest_sst_daily.py" >> "%LOG%" 2>&1
+if %ERRORLEVEL% NEQ 0 echo [ERROR] SST daily failed >> "%LOG%"
 
 echo [Purge] Removing maps older than 2 days...
 echo [Purge] Removing maps older than 2 days... >> "%LOG%"
@@ -58,6 +63,7 @@ echo [Git] Committing and pushing...
 echo [Git] Committing and pushing... >> "%LOG%"
 cd /d "%BASE%"
 git add Database\weather_mg.parquet
+git add Database\sst_daily.parquet
 git add Database\last_run.json
 git add -A Database/maps
 git diff --cached --quiet
