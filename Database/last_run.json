@@ -1,8 +1,9 @@
 {
-  "ecmwf": "10 Aug  09:30",
-  "maxar": "10 Aug  09:36",
-  "static": "10 Aug  09:36",
-  "opencharts": "10 Aug  09:32",
-  "era5": "10 Aug  09:37",
-  "gwi_pnorm": "10 Aug  09:39"
+  "ecmwf": "11 Aug  09:31",
+  "maxar": "11 Aug  09:36",
+  "static": "11 Aug  09:37",
+  "opencharts": "11 Aug  09:33",
+  "era5": "11 Aug  09:39",
+  "gwi_pnorm": "11 Aug  09:40",
+  "sst_daily": "11 Aug  09:41"
 }
